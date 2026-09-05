@@ -1453,7 +1453,7 @@ window.applyBeautyBranding=applyBeautyBranding;
 (function(){ // thème appliqué tôt (login + splash) depuis l'URL ou la dernière session
   var p=new URLSearchParams(location.search).get('theme');
   var v=p||(function(){try{return localStorage.getItem('hospi_vertical');}catch(e){return null;}})();
-  if(v==='beauty'|| /beaut/i.test(location.hostname))document.body.classList.add('beauty');
+  if(v==='beauty'|| /beaut/i.test(location.hostname)){document.body.classList.add('beauty');var _le=document.getElementById('loginEmail');if(_le)_le.placeholder='vous@institut.com';}
 })();
 function enterApp(user){
   document.getElementById('login').style.display='none';
