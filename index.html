@@ -1900,19 +1900,28 @@ setInterval(function(){var g=document.getElementById('rs_grid');if(g&&g.offsetPa
 window.openResaReal=function(id){
   var x=__resaCache.filter(function(r){return r.id===id;})[0];if(!x)return;__resaId=id;
   window.__resaContact={phone:x.phone||'',email:x.email||'',contact:x.contact||''};
+  var beauty=_isBeauty();
   var d=new Date(x.date_time);
   var when=d.toLocaleDateString((window.__loc||'fr-FR'),{weekday:'long',day:'numeric',month:'long'})+' · '+('0'+d.getHours()).slice(-2)+'h'+('0'+d.getMinutes()).slice(-2);
-  var ppl=(+x.covers|| ((+x.adults||0)+(+x.children||0)) )+' couverts';
-  if(x.adults!=null||x.children!=null)ppl+=' ('+(+x.adults||0)+' ad.'+((+x.children)?(' · '+(+x.children)+' enf.'):'')+')';
-  var h='🗓️ '+when+'<br>👥 '+ppl;
-  if(x.allergens)h+='<br>⚠️ Allergènes : '+_esc(x.allergens);
+  var h='🗓️ '+when;
+  if(beauty){
+    if(x.service)h+='<br>💅 '+_esc(x.service)+(x.service_dur?(' · '+x.service_dur+' min'):'');
+    var _sn=_staffName(x.staff_id);if(_sn)h+='<br>👩 Avec '+_esc(_sn);
+  }else{
+    var ppl=(+x.covers|| ((+x.adults||0)+(+x.children||0)) )+' couverts';
+    if(x.adults!=null||x.children!=null)ppl+=' ('+(+x.adults||0)+' ad.'+((+x.children)?(' · '+(+x.children)+' enf.'):'')+')';
+    h+='<br>👥 '+ppl;
+  }
+  if(x.allergens)h+='<br>⚠️ '+(beauty?'Remarque santé : ':'Allergènes : ')+_esc(x.allergens);
   h+='<br>🔗 Origine : '+_esc(x.source||'—');
   if(x.phone)h+='<br>📞 '+_esc(x.phone);
   if(x.email)h+='<br>✉️ '+_esc(x.email);
   var late=_resaLate(x);
   var stLabel={pending:'⏳ En attente de confirmation',confirmed:(late?'⏰ En retard':'Confirmée'),arrived:'✓ Arrivé',cancelled:'Annulée',no_show:'🚫 No-show'}[x.status]||'—';
-  var tname=_tableName(x.table_id);
-  h+='<br>🍽️ Table : <b>'+(tname?_esc(tname):'non assignée')+'</b> <a onclick="resaTablePicker()" style="cursor:pointer;color:var(--gold,#C4A265);font-weight:600;font-size:13px">— '+(tname?'changer':'assigner')+'</a>';
+  if(!beauty){
+    var tname=_tableName(x.table_id);
+    h+='<br>🍽️ Table : <b>'+(tname?_esc(tname):'non assignée')+'</b> <a onclick="resaTablePicker()" style="cursor:pointer;color:var(--gold,#C4A265);font-weight:600;font-size:13px">— '+(tname?'changer':'assigner')+'</a>';
+  }
   h+='<br>📝 '+_esc(x.notes||'—')+'<br>📌 Statut : <b>'+stLabel+'</b>';
   document.getElementById('rm_name').textContent=x.name||'Réservation';
   document.getElementById('rm_body').innerHTML=h;
