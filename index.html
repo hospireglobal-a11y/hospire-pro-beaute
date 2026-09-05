@@ -2078,6 +2078,20 @@ async function findFreeStaff(cands,startISO,endISO){
   }
   return null;
 }
+function _hm(t){var m=/^(\d{1,2}):(\d{2})/.exec(t||'');return m?(+m[1]*60+ +m[2]):null;}
+/* Beauté : la date/heure choisie tombe-t-elle dans une fenêtre d'ouverture (jour ouvert + heure valide) ? */
+function _beautyWithinHours(dt,dur){
+  var w=(window.__resaCfg&&window.__resaCfg.windows)||{};
+  if(!w||!Object.keys(w).length)return true; // config non chargée → ne pas bloquer
+  var m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(dt||'');if(!m)return true;
+  var wd=new Date(+m[1],+m[2]-1,+m[3],12,0,0).getDay();
+  var key=['sun','mon','tue','wed','thu','fri','sat'][wd];
+  var wins=w[key]||[];
+  if(!wins.length)return false; // jour fermé
+  var startMin=+m[4]*60+ +m[5],endMin=startMin+(dur||0);
+  for(var i=0;i<wins.length;i++){var s=_hm(wins[i].start),e=_hm(wins[i].end);if(s!=null&&e!=null&&startMin>=s&&endMin<=e)return true;}
+  return false;
+}
 async function resaCreateBeauty(){
   var g=function(id){var e=document.getElementById(id);return e?(e.value||'').trim():'';};
   var res=document.getElementById('nr_res');
@@ -2092,6 +2106,8 @@ async function resaCreateBeauty(){
   var startISO=new Date(dt.length===16?dt+':00':dt).toISOString();
   var endISO=new Date(new Date(startISO).getTime()+dur*60000).toISOString();
   if(!window.__resaStaff||!window.__resaStaff.length){try{await loadResaCfg();}catch(e){}}
+  if(!window.__resaCfg||!window.__resaCfg.windows||!Object.keys(window.__resaCfg.windows).length){try{await loadResaCfg();}catch(e){}}
+  if(!_beautyWithinHours(dt,dur)){res.style.color='var(--rouge)';res.textContent="Hors des horaires d'ouverture ce jour-là (jour fermé ou heure hors créneau).";return;}
   var cands=(window.__resaStaff||[]).filter(function(s){return s.active!==false;});
   if(staffId)cands=cands.filter(function(s){return String(s.id)===String(staffId);});
   if(!cands.length){res.style.color='var(--rouge)';res.textContent='Ajoute au moins un·e praticien·ne dans la configuration.';return;}
