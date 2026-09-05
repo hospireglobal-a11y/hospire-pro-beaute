@@ -1361,7 +1361,7 @@ function hospSplash(cb){
 }
 /* ===== Vertical (niche) : resto par défaut, beauty via compte / ?theme=beauty ===== */
 function applyVertical(v){
-  var beauty=(v==='beauty');
+  var beauty=(v==='beauty')|| /beaut/i.test(location.hostname);
   document.body.classList.toggle('beauty',beauty);
   try{localStorage.setItem('hospi_vertical',beauty?'beauty':'resto');}catch(e){}
   if(beauty){setTimeout(applyBeautyTerms,0);setTimeout(applyBeautyTerms,600);}
@@ -1453,7 +1453,7 @@ window.applyBeautyBranding=applyBeautyBranding;
 (function(){ // thème appliqué tôt (login + splash) depuis l'URL ou la dernière session
   var p=new URLSearchParams(location.search).get('theme');
   var v=p||(function(){try{return localStorage.getItem('hospi_vertical');}catch(e){return null;}})();
-  if(v==='beauty')document.body.classList.add('beauty');
+  if(v==='beauty'|| /beaut/i.test(location.hostname))document.body.classList.add('beauty');
 })();
 function enterApp(user){
   document.getElementById('login').style.display='none';
