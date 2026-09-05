@@ -1111,6 +1111,7 @@ window.loadProfile=async function(){
     var r=await sb.from('brand_profiles').select('data').eq('blog_id',String(window.currentBlog)).maybeSingle();
     var d=(r&&r.data&&r.data.data)||{};window.__brandProfile=d;
     BP_FIELDS.forEach(function(k){var el=document.getElementById('bp_'+k);if(el)el.value=(d[k]!=null?d[k]:'');});
+    if(window.applyBeautyBranding)applyBeautyBranding();
     syncPills();updateBProg();
   }catch(e){}
 };
@@ -1410,6 +1411,45 @@ function applyBeautyTerms(){
   }catch(e){}
 }
 window.applyBeautyTerms=applyBeautyTerms;
+/* Formulaire "Mon branding" adapté au secteur beauté (labels, placeholders, sections, options).
+   Ciblé par id → robuste, idempotent, n'affecte QUE le mode beauté. */
+function applyBeautyBranding(){
+  if(!document.body.classList.contains('beauty'))return;
+  var root=document.getElementById('branding');if(!root)return;
+  var sub=root.querySelector('.bhero .sub');
+  if(sub)sub.textContent="Raconte-moi ton institut comme à une amie. Plus je te connais, plus le contenu que je crée te ressemble — ton ton, ta ville, tes prestations, tes clientes. Tout reste privé.";
+  var F={
+    bp_name:["Nom de l'institut","Ex : Institut de l'Ongle"],
+    bp_type:["Type de prestations / spécialité","Ex : onglerie, coiffure, esthétique"],
+    bp_tone:[null,"Ex : chaleureux, bienveillant, un brin d'humour"],
+    bp_star:["Prestation star","Ex : la pose gel French"],
+    bp_specialties:[null,"Ex : nail art, semi-permanent, épilation au fil"],
+    bp_audience:[null,"Ex : mariées, jeunes actives, working girls"],
+    bp_seasons:[null,"Ex : mariages l'été, fêtes de fin d'année, Saint-Valentin"],
+    bp_goals:[null,"Ex : remplir les créneaux calmes, développer le semi-permanent, fidéliser les clientes"],
+    bp_improve:[null,"Ex : plus de rendez-vous en semaine, être plus visible sur Google, gagner des abonnées"],
+    bp_hashtags:[null,"#nyon #onglerie #nailart"],
+    bp_tag_accounts:[null,"Ex : @marque_vernis @distributeur_beaute"],
+    bp_story:[null,"Raconte l'histoire de ton institut, tes valeurs, une anecdote, ce dont tu es fière… Hospi s'en servira pour donner de l'âme à tes posts."]
+  };
+  Object.keys(F).forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    if(F[id][1]!=null)el.setAttribute('placeholder',F[id][1]);
+    if(F[id][0]!=null){var lb=el.parentNode&&el.parentNode.querySelector('label');if(lb)lb.textContent=F[id][0];}
+  });
+  var subMap={
+    "Ce qui te rend unique dans l'assiette.":"Ce qui te rend unique.",
+    "Ton histoire, ce qui te rend spécial. C'est là que la magie opère.":"Ton histoire, ce qui te rend spéciale. C'est là que la magie opère.",
+    "Les bases de ton établissement.":"Les bases de ton institut."
+  };
+  root.querySelectorAll('.bsec .bt p').forEach(function(p){var t=(p.textContent||'').trim();if(subMap[t])p.textContent=subMap[t];});
+  root.querySelectorAll('.bsec .bt .ic').forEach(function(ic){if((ic.textContent||'').trim()==='🍽️')ic.textContent='💅';});
+  var diets=["Végan","Cruelty-free","Bio","Hypoallergénique","Sans formol","Prothésiste certifiée"];
+  var occ=["Mariage","Anniversaire","Événement","Entre copines","Self-care","Cadeau"];
+  root.querySelectorAll('[data-group="diets"]').forEach(function(s,i){if(diets[i]){s.textContent=diets[i];s.setAttribute('data-val',diets[i]);}});
+  root.querySelectorAll('[data-group="occasions"]').forEach(function(s,i){if(occ[i]){s.textContent=occ[i];s.setAttribute('data-val',occ[i]);}});
+}
+window.applyBeautyBranding=applyBeautyBranding;
 (function(){ // thème appliqué tôt (login + splash) depuis l'URL ou la dernière session
   var p=new URLSearchParams(location.search).get('theme');
   var v=p||(function(){try{return localStorage.getItem('hospi_vertical');}catch(e){return null;}})();
@@ -2187,9 +2227,11 @@ window.saveResaConfig=async function(){
 window.fillWidget=function(){
   var link=document.getElementById('wg_link');if(!link)return;
   var brand=(document.getElementById('brandTitle')&&document.getElementById('brandTitle').textContent)||'Réserver';
-  var url=location.origin+'/reserver.html?b='+encodeURIComponent(window.currentBlog||'')+'&name='+encodeURIComponent(brand);
+  var beauty=document.body.classList.contains('beauty');
+  var url=location.origin+'/reserver.html?b='+encodeURIComponent(window.currentBlog||'')+'&name='+encodeURIComponent(brand)+(beauty?'&v=beauty':'');
   link.value=url;
-  var emb=document.getElementById('wg_embed');if(emb)emb.value='<iframe src="'+url+'" style="width:100%;min-height:640px;border:0" title="Réserver une table"></iframe>';
+  var ititle=beauty?'Prendre rendez-vous':'Réserver une table';
+  var emb=document.getElementById('wg_embed');if(emb)emb.value='<iframe src="'+url+'" style="width:100%;min-height:640px;border:0" title="'+ititle+'"></iframe>';
   var pv=document.getElementById('wg_preview');if(pv&&pv.getAttribute('src')!==url)pv.setAttribute('src',url);
 };
 window.wgCopy=function(id){var e=document.getElementById(id);if(!e)return;e.select();try{document.execCommand('copy');}catch(x){}if(navigator.clipboard){try{navigator.clipboard.writeText(e.value);}catch(x){}}var m=document.getElementById('wg_msg');if(m){m.textContent='✓ Copié !';setTimeout(function(){m.textContent='';},1500);}};
