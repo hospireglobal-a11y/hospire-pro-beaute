@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réserver une table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F5F0E8;--card:#fff;--ink:#1A1510;--muted:#8C857A;--line:#EAE4D9;--gold:#C4A265;--espresso:#1A1510;--vert:#2E9E6B;--rouge:#C9564F}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;padding:20px}
+  .wrap{max-width:460px;margin:0 auto}
+  .disp{font-family:'Fraunces',Georgia,serif}
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .head .brand{font-family:'Fraunces',serif;font-weight:600;font-size:22px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 30px rgba(26,21,16,.06)}
+  label{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 7px}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13px;font:inherit;font-size:15px;background:#fff;outline:none;color:var(--ink);box-sizing:border-box;max-width:100%}
+  input[type=date],input[type=time],input[type=datetime-local]{min-width:0;-webkit-appearance:none;appearance:none;text-align:left}
+  input[type=date]::-webkit-date-and-time-value{text-align:left}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,162,101,.15)}
+  .row{display:flex;gap:12px}.row>div{flex:1;min-width:0}
+  .field{margin-bottom:14px}
+  .btn{border:none;border-radius:100px;padding:14px 20px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;transition:.2s;width:100%}
+  .btn.gold{background:linear-gradient(135deg,#D8B877,#B5904E);color:#1A1510}
+  .btn.gold:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+  .slot{border:1px solid var(--line);border-radius:12px;padding:11px 4px;text-align:center;font-size:14px;font-weight:500;cursor:pointer;background:#fff;transition:.15s}
+  .slot:hover{border-color:var(--gold)}
+  .slot.on{background:var(--espresso);color:#F5F0E8;border-color:var(--espresso)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+  .msg{font-size:14px;color:var(--muted);text-align:center;padding:18px 0}
+  .consent{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--muted);line-height:1.5;margin:4px 0 14px}
+  .consent input{width:auto;margin-top:2px}
+  .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+  .foot .dot{color:var(--gold)}
+  .ok{text-align:center;padding:10px 0}
+  .ok .ico{width:64px;height:64px;border-radius:50%;background:rgba(46,158,107,.12);color:var(--vert);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px}
+  .hide{display:none}
+  .recap{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:13.5px;color:var(--ink);margin-bottom:14px;line-height:1.7}
+  .err{color:var(--rouge);font-size:13px;margin:8px 0}
+  .tabs{display:flex;gap:6px;background:#EFE8DC;border-radius:100px;padding:4px;margin-bottom:16px}
+  .tab{flex:1;border:none;background:transparent;border-radius:100px;padding:10px 8px;font:inherit;font-weight:600;font-size:13.5px;color:var(--muted);cursor:pointer;transition:.15s}
+  .tab.on{background:var(--espresso);color:#F5F0E8}
+  .gbanner{background:rgba(196,162,101,.12);border:1px solid rgba(196,162,101,.35);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;color:#8a6d2e;margin-bottom:16px}
+  /* ===== Thème Beauté (rose pastel) ===== */
+  body.beauty{--bg:#FCF5F3;--ink:#4A333A;--muted:#B295A0;--line:#F4E4E8;--gold:#E88FA8;--espresso:#6E4B57}
+  body.beauty .btn.gold{background:linear-gradient(135deg,#F3B6CB,#E88FA8);color:#6B2C43}
+  body.beauty .slot.on{background:#6E4B57;border-color:#6E4B57;color:#FCF5F3}
+  body.beauty .tab.on{background:#6E4B57;color:#FCF5F3}
+  body.beauty input:focus,body.beauty select:focus,body.beauty textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,143,168,.16)}
+  body.beauty .ok .ico{background:rgba(232,143,168,.14);color:#D97E97}
+  body.beauty .gbanner{background:rgba(232,143,168,.12);border-color:rgba(232,143,168,.35);color:#b5567f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><div class="brand disp" id="brand">Réserver</div></div>
+  <div class="sub" id="sub">Réservation en ligne · sans commission</div>
+
+  <div class="tabs" id="modeTabs">
+    <button class="tab on" data-m="table" onclick="setMode('table')">Une table</button>
+    <button class="tab" data-m="group" onclick="setMode('group')">Groupe / événement</button>
+  </div>
+
+  <!-- ÉTAPE 1 : créneau -->
+  <div class="card" id="step1">
+    <div class="field" id="fieldPresta" style="display:none"><label>Prestation</label><select id="presta"></select></div>
+    <div class="field" id="fieldStaff" style="display:none"><label>Avec qui ?</label><select id="staff"></select></div>
+    <div class="row">
+      <div class="field" id="fieldParty"><label>Personnes</label><select id="party"></select></div>
+      <div class="field"><label>Date</label><input type="date" id="date"></div>
+    </div>
+    <label>Créneaux disponibles</label>
+    <div id="slots" class="slots"></div>
+    <div id="slotMsg" class="msg hide"></div>
+    <div class="note" id="turnNote"></div>
+    <button class="btn gold" id="toStep2" style="margin-top:16px" disabled>Continuer →</button>
+  </div>
+
+  <!-- ÉTAPE 2 : coordonnées -->
+  <div class="card hide" id="step2">
+    <div class="recap" id="recap"></div>
+    <div class="field"><label>Nom complet</label><input id="f_name" placeholder="Prénom Nom"></div>
+    <div class="row">
+      <div class="field"><label>Téléphone</label><input id="f_phone" placeholder="06 12 34 56 78"></div>
+      <div class="field" id="fieldChildren"><label>Dont enfants</label><input type="number" id="f_children" min="0" value="0"></div>
+    </div>
+    <div class="field"><label>Email (confirmation)</label><input id="f_email" type="email" placeholder="vous@email.com"></div>
+    <div class="field" id="fieldAllergens"><label>Allergènes / régime</label><input id="f_allergens" placeholder="Fruits à coque, sans gluten…"></div>
+    <div class="field"><label>Message (optionnel)</label><textarea id="f_notes" rows="2" placeholder="Occasion, chaise bébé…"></textarea></div>
+    <label class="consent"><input type="checkbox" id="f_consent"><span>J'accepte que mes données soient utilisées pour gérer ma réservation, conformément à la politique de confidentialité de l'établissement.</span></label>
+    <div class="err hide" id="err2"></div>
+    <div class="row">
+      <button class="btn ghost" style="flex:0 0 40%" id="back2">← Retour</button>
+      <button class="btn gold" id="submit">Réserver</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : confirmation -->
+  <div class="card hide" id="step3">
+    <div class="ok">
+      <div class="ico">✓</div>
+      <div class="disp" style="font-size:22px;font-weight:600;margin-bottom:6px">Réservation confirmée</div>
+      <div id="okRecap" style="color:var(--muted);font-size:14px;line-height:1.7"></div>
+      <div id="okEmail" style="color:var(--muted);font-size:12.5px;margin-top:12px"></div>
+      <button class="btn ghost" style="margin-top:18px;width:auto;padding:12px 24px" onclick="location.reload()">Nouvelle réservation</button>
+    </div>
+  </div>
+
+  <!-- MODE GROUPE : demande -->
+  <div class="card hide" id="gcard">
+    <div class="gbanner">⏳ Les réservations de groupe sont validées par le restaurant. Envoie ta demande : tu recevras un email de confirmation dès qu'elle est acceptée.</div>
+    <div class="row">
+      <div class="field"><label>Personnes</label><select id="g_party"></select></div>
+      <div class="field"><label>Date</label><input type="date" id="g_date"></div>
+    </div>
+    <label>Créneau souhaité</label>
+    <div id="g_slots" class="slots"></div>
+    <div id="g_slotMsg" class="msg hide"></div>
+    <div class="field" style="margin-top:16px"><label>Nom complet</label><input id="g_name" placeholder="Prénom Nom"></div>
+    <div class="row">
+      <div class="field"><label>Téléphone</label><input id="g_phone" placeholder="06 12 34 56 78"></div>
+      <div class="field"><label>Email</label><input id="g_email" type="email" placeholder="vous@email.com"></div>
+    </div>
+    <div class="field"><label>Allergènes / régime</label><input id="g_allergens" placeholder="Fruits à coque, sans gluten…"></div>
+    <div class="field"><label>Message (occasion, besoins…)</label><textarea id="g_notes" rows="2" placeholder="Anniversaire, repas d'entreprise, gâteau…"></textarea></div>
+    <label class="consent"><input type="checkbox" id="g_consent"><span>J'accepte que mes données soient utilisées pour gérer ma demande, conformément à la politique de confidentialité de l'établissement.</span></label>
+    <div class="err hide" id="g_err"></div>
+    <button class="btn gold" id="g_submit">Envoyer la demande</button>
+  </div>
+
+  <!-- MODE GROUPE : demande envoyée -->
+  <div class="card hide" id="gok">
+    <div class="ok">
+      <div class="ico" style="background:rgba(196,162,101,.14);color:#B5904E">⏳</div>
+      <div class="disp" style="font-size:22px;font-weight:600;margin-bottom:6px">Demande envoyée</div>
+      <div id="gokRecap" style="color:var(--muted);font-size:14px;line-height:1.7"></div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:12px">Le restaurant étudie ta demande et te répondra par email très vite (confirmation ou proposition d'une autre date).</div>
+      <button class="btn ghost" style="margin-top:18px;width:auto;padding:12px 24px" onclick="location.reload()">Nouvelle demande</button>
+    </div>
+  </div>
+
+  <div class="foot"><span class="dot">.</span>HOSPIRE — réservation sécurisée</div>
+</div>
+
+<script>
+var QS=new URLSearchParams(location.search);
+var BLOG=QS.get('b')||QS.get('blogId')||'';
+var V=(QS.get('v')||QS.get('mode')||'');
+var BEAUTY=/beau/i.test(V);
+var NAME=QS.get('name')||(BEAUTY?'Prendre rendez-vous':'Réserver une table');
+var REPLYTO=QS.get('mail')||'';
+var MAXDAYS=parseInt(QS.get('days'),10)||60;
+var sel={date:'',time:'',party:2,turn:90,dur:0,service:'',staffId:''};
+var $=function(id){return document.getElementById(id);};
+document.title=(BEAUTY?'Rendez-vous · ':'Réserver · ')+NAME;
+$('brand').textContent=NAME;
+
+(function(){
+  var t=new Date();var pad=function(n){return('0'+n).slice(-2);};
+  var todayStr=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());
+  var maxD=new Date(t.getTime()+MAXDAYS*864e5);var maxStr=maxD.getFullYear()+'-'+pad(maxD.getMonth()+1)+'-'+pad(maxD.getDate());
+  var d=$('date');d.min=todayStr;d.max=maxStr;d.value=todayStr;
+
+  if(BEAUTY){
+    document.body.classList.add('beauty');
+    $('sub').textContent='Prise de rendez-vous en ligne';
+    var mt=$('modeTabs');if(mt)mt.style.display='none';           // pas de mode "groupe" en beauté
+    $('fieldParty').style.display='none';
+    var fc=$('fieldChildren');if(fc)fc.style.display='none';
+    var fa=$('fieldAllergens');if(fa){fa.querySelector('label').textContent='Remarque santé / allergie (optionnel)';fa.querySelector('input').placeholder='Ongles fragiles, grossesse, allergie…';}
+    $('fieldPresta').style.display='';
+    var sb2=$('submit');if(sb2)sb2.textContent='Confirmer';
+    $('presta').onchange=onPrestaChange;
+    $('staff').onchange=loadSlots;
+    d.onchange=loadSlots;
+    if(!BLOG){showMsg("Lien de rendez-vous invalide (établissement manquant).");}
+    else initBeauty();
+    return;
+  }
+
+  var p=$('party');for(var i=1;i<=12;i++){var o=document.createElement('option');o.value=i;o.textContent=i+(i>1?' personnes':' personne');p.appendChild(o);}
+  p.value=2;
+  p.onchange=loadSlots;d.onchange=loadSlots;
+  if(!BLOG){$('slots').innerHTML='';showMsg("Lien de réservation invalide (établissement manquant).");}
+  else loadSlots();
+})();
+
+/* ===== BEAUTÉ : prestations + praticien ===== */
+async function initBeauty(){
+  // 1) Charger les prestations (avec durée) depuis /api/site
+  try{
+    var r=await fetch('/api/site?b='+encodeURIComponent(BLOG));var j=await r.json();
+    var carte=(j&&j.carte)||[];
+    var opts=carte.filter(function(d){return d&&d.name&&parseInt(d.dur,10)>0;});
+    var ps=$('presta');ps.innerHTML='';
+    if(!opts.length){showMsg("Prise de rendez-vous bientôt disponible.");return;}
+    var groups={};opts.forEach(function(d){var g=d.menu||'Prestations';(groups[g]=groups[g]||[]).push(d);});
+    Object.keys(groups).forEach(function(g){
+      var og=document.createElement('optgroup');og.label=g;
+      groups[g].forEach(function(d){var o=document.createElement('option');o.value=d.dur;o.setAttribute('data-name',d.name);o.textContent=d.name+' · '+d.dur+' min'+(d.price?(' · '+d.price):'');og.appendChild(o);});
+      ps.appendChild(og);
+    });
+    var first=ps.options[0];sel.dur=parseInt(first.value,10)||0;sel.service=first.getAttribute('data-name')||'';
+  }catch(e){showMsg("Erreur de chargement. Réessaie.");return;}
+  // 2) Charger la liste des praticien·nes (via une 1re dispo)
+  loadSlots();
+}
+function onPrestaChange(){
+  var o=$('presta').options[$('presta').selectedIndex];
+  sel.dur=parseInt(o.value,10)||0;sel.service=o.getAttribute('data-name')||'';
+  loadSlots();
+}
+function fillStaff(list){
+  var box=$('fieldStaff'),sSel=$('staff');
+  if(!list||list.length<=1){box.style.display='none';sel.staffId='';return;}
+  if(sSel.options.length!==list.length+1){
+    sSel.innerHTML='<option value="">Sans préférence</option>';
+    list.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.name;sSel.appendChild(o);});
+  }
+  box.style.display='';sel.staffId=sSel.value||'';
+}
+
+function showMsg(m){$('slotMsg').textContent=m;$('slotMsg').classList.remove('hide');$('slots').innerHTML='';}
+function hideMsg(){$('slotMsg').classList.add('hide');}
+
+async function loadSlotsBeauty(){
+  sel.date=$('date').value;sel.time='';sel.staffId=($('staff')&&$('staff').value)||'';
+  $('toStep2').disabled=true;$('slots').innerHTML='<div class="msg">Recherche…</div>';hideMsg();$('turnNote').textContent='';
+  if(!BLOG||!sel.date||!sel.dur)return;
+  try{
+    var url='/api/book?blogId='+encodeURIComponent(BLOG)+'&date='+sel.date+'&dur='+sel.dur+(sel.staffId?('&staffId='+encodeURIComponent(sel.staffId)):'');
+    var r=await fetch(url);var j=await r.json();
+    if(j&&j.staff)fillStaff(j.staff);
+    var slots=(j&&j.slots)||[];
+    if(!slots.length){
+      var reason=(j&&j.reason)||'';
+      var m=reason==='no_staff'?"Prise de rendez-vous bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":"Complet ce jour — essaie une autre date.";
+      showMsg(m);return;
+    }
+    $('slots').innerHTML='';
+    slots.forEach(function(s){var el=document.createElement('div');el.className='slot';el.textContent=s;el.onclick=function(){pickSlot(s,el);};$('slots').appendChild(el);});
+    $('turnNote').textContent='Durée : '+sel.dur+' min.';
+  }catch(e){showMsg("Erreur de chargement. Réessaie.");}
+}
+async function loadSlots(){
+  if(BEAUTY)return loadSlotsBeauty();
+  sel.party=parseInt($('party').value,10)||2;sel.date=$('date').value;sel.time='';
+  $('toStep2').disabled=true;$('slots').innerHTML='<div class="msg">Recherche…</div>';hideMsg();$('turnNote').textContent='';
+  if(!BLOG||!sel.date)return;
+  try{
+    var r=await fetch('/api/book?blogId='+encodeURIComponent(BLOG)+'&date='+sel.date+'&party='+sel.party);
+    var j=await r.json();
+    var slots=(j&&j.slots)||[];
+    if(j&&j.turn)sel.turn=j.turn;
+    if(!slots.length){
+      var reason=(j&&j.reason)||'';
+      var m=reason==='no_tables'?"Réservation en ligne bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='party_too_big'?("Pour "+sel.party+" personnes, contacte-nous directement."):"Complet ce jour — essaie une autre date.";
+      showMsg(m);return;
+    }
+    $('slots').innerHTML='';
+    slots.forEach(function(s){var el=document.createElement('div');el.className='slot';el.textContent=s;el.onclick=function(){pickSlot(s,el);};$('slots').appendChild(el);});
+    $('turnNote').textContent='Durée estimée de la table : '+(sel.turn)+' min.';
+  }catch(e){showMsg("Erreur de chargement. Réessaie.");}
+}
+function pickSlot(s,el){sel.time=s;document.querySelectorAll('.slot').forEach(function(x){x.classList.remove('on');});el.classList.add('on');$('toStep2').disabled=false;}
+
+function staffName(){var s=$('staff');if(!s||!sel.staffId)return '';var o=s.options[s.selectedIndex];return o?o.textContent:'';}
+$('toStep2').onclick=function(){
+  var d=new Date(sel.date+'T12:00:00');
+  var dstr=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  if(BEAUTY){
+    var sn=staffName();
+    $('recap').innerHTML='<b>'+NAME+'</b><br>'+sel.service+'<br>'+dstr+' · '+sel.time+' · '+sel.dur+' min'+(sn?('<br>Avec '+sn):'');
+  }else{
+    $('recap').innerHTML='<b>'+NAME+'</b><br>'+dstr+' · '+sel.time+'<br>'+sel.party+' personne'+(sel.party>1?'s':'');
+  }
+  $('step1').classList.add('hide');$('step2').classList.remove('hide');window.scrollTo(0,0);
+};
+$('back2').onclick=function(){$('step2').classList.add('hide');$('step1').classList.remove('hide');};
+
+$('submit').onclick=async function(){
+  var err=$('err2');err.classList.add('hide');
+  var name=$('f_name').value.trim(),phone=$('f_phone').value.trim(),email=$('f_email').value.trim();
+  var children=parseInt($('f_children').value,10)||0,allergens=$('f_allergens').value.trim(),notes=$('f_notes').value.trim();
+  if(!name){return fail("Indique ton nom.");}
+  if(!phone&&!email){return fail("Laisse un téléphone ou un email pour te contacter.");}
+  if(!$('f_consent').checked){return fail("Merci d'accepter l'utilisation de tes données.");}
+  var btn=$('submit');btn.disabled=true;btn.textContent='Réservation…';
+  try{
+    var payload=BEAUTY?{
+      blogId:BLOG,date:sel.date,time:sel.time,dur:sel.dur,service:sel.service,staffId:sel.staffId,
+      name:name,phone:phone,email:email,notes:[allergens,notes].filter(Boolean).join(' · '),consent:true,
+      brandName:NAME,replyTo:REPLYTO
+    }:{
+      blogId:BLOG,date:sel.date,time:sel.time,party:sel.party,children:children,
+      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,
+      brandName:NAME,replyTo:REPLYTO
+    };
+    var r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    var j=await r.json();
+    if(!r.ok){btn.disabled=false;btn.textContent=(BEAUTY?'Confirmer':'Réserver');return fail(j.error||"Impossible d'enregistrer. Réessaie.");}
+    var d=new Date(sel.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    if(BEAUTY){var sn=staffName();var t3=document.querySelector('#step3 .disp');if(t3)t3.textContent='Rendez-vous confirmé';$('okRecap').innerHTML=sel.service+'<br>'+d+' · '+sel.time+(sn?(' · '+sn):'')+'<br>'+NAME;}
+    else{$('okRecap').innerHTML=d+' · '+sel.time+'<br>'+sel.party+' personne'+(sel.party>1?'s':'')+' — '+NAME;}
+    $('okEmail').textContent=j.emailed?('Un email de confirmation a été envoyé à '+email+'.'):(email?'':'Pense à noter ta réservation.');
+    $('step2').classList.add('hide');$('step3').classList.remove('hide');window.scrollTo(0,0);
+  }catch(e){btn.disabled=false;btn.textContent=(BEAUTY?'Confirmer':'Réserver');fail("Erreur réseau. Réessaie.");}
+  function ok(){}
+};
+function fail(m){var err=document.getElementById('err2');err.textContent=m;err.classList.remove('hide');}
+
+/* ===== MODE GROUPE ===== */
+var gsel={date:'',time:'',party:8};
+window.setMode=function(m){
+  document.querySelectorAll('#modeTabs .tab').forEach(function(t){t.classList.toggle('on',t.getAttribute('data-m')===m);});
+  var table=(m==='table');
+  ['step1','step2','step3'].forEach(function(id){$(id).classList.add('hide');});
+  ['gcard','gok'].forEach(function(id){$(id).classList.add('hide');});
+  if(table){$('step1').classList.remove('hide');}
+  else{$('gcard').classList.remove('hide');if(!$('g_party').options.length)initGroup();}
+  window.scrollTo(0,0);
+};
+function initGroup(){
+  var p=$('g_party');for(var i=2;i<=30;i++){var o=document.createElement('option');o.value=i;o.textContent=i+' personnes';p.appendChild(o);}
+  p.value=8;gsel.party=8;
+  var d=$('g_date'),t=new Date(),pad=function(n){return('0'+n).slice(-2);};
+  var today=t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());
+  d.min=today;var max=new Date(t.getTime()+MAXDAYS*864e5);d.max=max.getFullYear()+'-'+pad(max.getMonth()+1)+'-'+pad(max.getDate());
+  d.value=today;
+  p.onchange=function(){gsel.party=parseInt(p.value,10)||8;};
+  d.onchange=loadGroupSlots;
+  loadGroupSlots();
+}
+async function loadGroupSlots(){
+  gsel.date=$('g_date').value;gsel.time='';
+  var box=$('g_slots');box.innerHTML='<div class="msg">Recherche…</div>';$('g_slotMsg').classList.add('hide');
+  if(!BLOG||!gsel.date)return;
+  try{
+    var r=await fetch('/api/book?blogId='+encodeURIComponent(BLOG)+'&date='+gsel.date+'&group=1');
+    var j=await r.json();var slots=(j&&j.slots)||[];
+    if(!slots.length){box.innerHTML='';$('g_slotMsg').textContent=(j&&j.reason==='closed')?"Fermé ce jour — choisis une autre date.":"Aucun horaire ce jour — choisis une autre date.";$('g_slotMsg').classList.remove('hide');return;}
+    box.innerHTML='';
+    slots.forEach(function(s){var el=document.createElement('div');el.className='slot';el.textContent=s;el.onclick=function(){gsel.time=s;document.querySelectorAll('#g_slots .slot').forEach(function(x){x.classList.remove('on');});el.classList.add('on');};box.appendChild(el);});
+  }catch(e){box.innerHTML='';$('g_slotMsg').textContent="Erreur de chargement. Réessaie.";$('g_slotMsg').classList.remove('hide');}
+}
+$('g_submit').onclick=async function(){
+  var err=$('g_err');err.classList.add('hide');
+  var name=$('g_name').value.trim(),phone=$('g_phone').value.trim(),email=$('g_email').value.trim();
+  var allergens=$('g_allergens').value.trim(),notes=$('g_notes').value.trim();
+  function gfail(m){err.textContent=m;err.classList.remove('hide');}
+  if(!gsel.date||!gsel.time){return gfail("Choisis une date et un créneau.");}
+  if(!name){return gfail("Indique ton nom.");}
+  if(!phone&&!email){return gfail("Laisse un téléphone ou un email pour te contacter.");}
+  if(!$('g_consent').checked){return gfail("Merci d'accepter l'utilisation de tes données.");}
+  var btn=$('g_submit');btn.disabled=true;btn.textContent='Envoi…';
+  try{
+    var r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      group:true,blogId:BLOG,date:gsel.date,time:gsel.time,party:gsel.party,
+      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,brandName:NAME
+    })});
+    var j=await r.json();
+    if(!r.ok){btn.disabled=false;btn.textContent='Envoyer la demande';return gfail(j.error||"Impossible d'envoyer la demande. Réessaie.");}
+    var d=new Date(gsel.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    $('gokRecap').innerHTML=d+' · '+gsel.time+'<br>'+gsel.party+' personnes — '+NAME;
+    $('gcard').classList.add('hide');$('gok').classList.remove('hide');window.scrollTo(0,0);
+  }catch(e){btn.disabled=false;btn.textContent='Envoyer la demande';gfail("Erreur réseau. Réessaie.");}
+};
+</script>
+</body>
+</html>
