@@ -142,6 +142,13 @@ module.exports = async function handler(req, res) {
   else if (action === "igReach") url = `${BASE}/stats/timeline/igReach?start=${start}&end=${end}&${auth(blogId, true)}`;
   else if (action === "igViews") url = `${BASE}/stats/timeline/igImpressions?start=${start}&end=${end}&${auth(blogId, true)}`;
   else if (action === "postsIg") url = `${BASE}/v2/analytics/posts/instagram?from=${start}&to=${end}&timezone=Europe/Paris&${auth(blogId, true)}`;
+  else if (action === "reelsIg") url = `${BASE}/v2/analytics/reels/instagram?from=${start}&to=${end}&timezone=Europe/Paris&${auth(blogId, true)}`;
+  else if (action === "storiesIg") url = `${BASE}/v2/analytics/stories/instagram?from=${start}&to=${end}&timezone=Europe/Paris&${auth(blogId, true)}`;
+  else if (action === "postsNet") {
+    const net = String(req.query.network || "").toLowerCase();
+    if (["facebook", "tiktok", "linkedin", "twitter"].indexOf(net) < 0) return res.status(400).json({ error: "network invalide" });
+    url = `${BASE}/v2/analytics/posts/${net}?from=${start}&to=${end}&timezone=Europe/Paris&${auth(blogId, true)}`;
+  }
   else if (action === "scheduled") url = `${BASE}/v2/scheduler/posts?start=${start}&end=${end}&timezone=Europe/Paris&${auth(blogId, true)}`;
   else if (action === "inboxReviews") url = `${BASE}/v2/inbox/reviews?provider=GMB&${auth(blogId, true)}`;
   else if (action === "inboxConvos") url = `${BASE}/v2/inbox/conversations?provider=${encodeURIComponent(provider || "instagrambusiness")}&${auth(blogId, true)}`;
