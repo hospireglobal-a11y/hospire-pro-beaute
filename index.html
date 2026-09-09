@@ -1490,6 +1490,13 @@ function applyBeautyTerms(){
       if(tr&&BEAUTY_EXACT[tr]){n.nodeValue=t.replace(tr,BEAUTY_EXACT[tr]);continue;}
       for(var i=0;i<BEAUTY_SUB.length;i++){if(t&&t.indexOf(BEAUTY_SUB[i][0])>=0)n.nodeValue=n.nodeValue.split(BEAUTY_SUB[i][0]).join(BEAUTY_SUB[i][1]);}
     }
+    /* Placeholders adaptés (exemples beauté, pas de brunch 🍳) */
+    var _bf=document.getElementById('cpBrief');
+    if(_bf){_bf.setAttribute('placeholder',"Ex : photos d'une pose gel French réalisée aujourd'hui — nail art fin, ambiance cocooning. Envie de montrer le résultat et d'inviter à prendre rendez-vous.");_bf.__frPh=_bf.getAttribute('placeholder');}
+    var _st=document.getElementById('stText');
+    if(_st&&_st.value==='Le brunch revient dimanche 🥐')_st.value='Nouvelle couleur de la semaine 💅';
+    var _sc=document.getElementById('stCapT');
+    if(_sc&&_sc.textContent==='Le brunch revient dimanche 🥐')_sc.textContent='Nouvelle couleur de la semaine 💅';
   }catch(e){}
 }
 window.applyBeautyTerms=applyBeautyTerms;
@@ -3142,6 +3149,8 @@ window.saveSite=async function(){
 "fort engagement":["strong engagement","fuerte interacción"],
 "Profil complet à 100% 🎉 Hospi te connaît par cœur.":["Profile 100% complete 🎉 Hospi knows you by heart.","Perfil completo al 100% 🎉 Hospi te conoce de memoria."],
 "Modifier le rendez-vous":["Edit appointment","Modificar la cita"],
+"Ex : photos d'une pose gel French réalisée aujourd'hui — nail art fin, ambiance cocooning. Envie de montrer le résultat et d'inviter à prendre rendez-vous.":["E.g.: photos of a gel French set done today — fine nail art, cosy vibe. Want to show off the result and invite people to book.","Ej.: fotos de una manicura gel French hecha hoy — nail art fino, ambiente cocooning. Quiero enseñar el resultado e invitar a pedir cita."],
+"Nouvelle couleur de la semaine 💅":["New colour of the week 💅","Nuevo color de la semana 💅"],
 "Nouveau rendez-vous":["New appointment","Nueva cita"],
 "Profil complet à 100% 🎉 Hospi te connaît par cœur.":["Profile 100% complete 🎉 Hospi knows you by heart.","Perfil completo al 100% 🎉 Hospi te conoce de memoria."],
 "· Tes réseaux · 30 derniers jours":["· Your networks · last 30 days","· Tus redes · últimos 30 días"],
