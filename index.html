@@ -280,11 +280,8 @@
     .rescal .day{min-height:120px}
     /* Réseaux : 2 colonnes au lieu de déborder */
     .netgrid{grid-template-columns:1fr 1fr!important;gap:14px!important}
-    /* Nouveau post : réseaux en pastilles lisibles avec libellé */
-    .netpick{gap:10px}
-    .netopt{padding:9px 13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.6)}
-    .netlbl{display:inline;font-size:14px;color:var(--ink);font-weight:500}
-    .cpNet{width:18px;height:18px;accent-color:var(--gold)}
+    /* Nouveau post : chips réseaux sur 2 colonnes */
+    .netpick{grid-template-columns:1fr 1fr}
     /* Inputs date/heure : ne débordent plus du cadre */
     input,select,textarea{box-sizing:border-box;max-width:100%}
     input[type=date],input[type=datetime-local],input[type=time]{width:100%;min-width:0;box-sizing:border-box;font-size:15px;-webkit-appearance:none;appearance:none;text-align:left}
@@ -308,6 +305,25 @@
     .menu a{font-size:13px;padding:7px 11px}
   }
 
+  /* ---- Compositeur « Nouveau post » : étapes, chips réseaux, aide Hospi ---- */
+  .cstep{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);margin:0 0 10px}
+  .cstep .cnum{width:22px;height:22px;border-radius:50%;background:var(--gold,#C4A265);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:0;flex-shrink:0}
+  .hassist{background:linear-gradient(135deg,rgba(124,92,252,.09),rgba(196,162,101,.10));border:1px solid rgba(124,92,252,.25);border-radius:16px;padding:14px}
+  .hassist .ha-top{display:flex;gap:11px;align-items:flex-start;margin-bottom:10px}
+  .hassist .ha-top img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 12%;flex-shrink:0;border:2px solid rgba(124,92,252,.35)}
+  .hassist .ha-top b{display:block;font-size:13.5px}
+  .hassist .ha-top small{display:block;font-size:12px;color:var(--muted);line-height:1.45;margin-top:2px}
+  .hassist textarea{width:100%;box-sizing:border-box;font-size:13.5px}
+  .netpick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .netopt{position:relative;display:flex;align-items:center;gap:9px;padding:11px 13px;border:1.5px solid var(--line);border-radius:14px;background:rgba(255,255,255,.65);cursor:pointer;user-select:none;-webkit-user-select:none;transition:border-color .18s,background .18s,box-shadow .18s}
+  .netopt input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+  .netopt svg{flex-shrink:0}
+  .netlbl{font-size:14px;font-weight:500;color:var(--ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .netopt .nck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);color:transparent;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s}
+  .netopt.on{border-color:var(--gold,#C4A265);background:rgba(196,162,101,.12);box-shadow:0 2px 10px rgba(196,162,101,.18)}
+  .netopt.on .nck{background:var(--gold,#C4A265);border-color:var(--gold,#C4A265);color:#fff}
+  body.dark .netopt{background:rgba(255,255,255,.05)}
+  body.dark .netopt.on{background:rgba(196,162,101,.16)}
   /* Hospi slide-over */
   #hospiBack{position:fixed;inset:0;z-index:55;background:rgba(20,19,16,.38);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.35s ease}
   #hospiBack.on{opacity:1;pointer-events:auto}
@@ -460,21 +476,37 @@
   #report .r-recos{margin:0;padding:0;list-style:none;counter-reset:r}
   #report .r-recos li{counter-increment:r;position:relative;padding:10px 0 10px 40px;border-bottom:1px solid #EAE4D9;font-size:13.5px;line-height:1.5}
   #report .r-recos li:before{content:counter(r);position:absolute;left:0;top:9px;width:26px;height:26px;background:#C4A265;color:#1A1510;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
-  #report .r-foot{margin-top:24px;padding-top:14px;border-top:1px solid #EAE4D9;font-size:11px;color:#8C857A;text-align:center}
+  #report .r-foot{margin-top:24px;padding-top:14px;border-top:1px solid #EAE4D9;font-size:11px;color:#8C857A;text-align:center;display:flex;justify-content:space-between;gap:10px}
+  #report .r-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#C4A265;font-weight:700;margin-bottom:4px}
+  #report .r-tp{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #EAE4D9}
+  #report .r-tp .tp-rank{width:26px;height:26px;border-radius:8px;background:#1A1510;color:#E9D9B4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+  #report .r-tp .tp-main{flex:1;min-width:0}
+  #report .r-tp .tp-t{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #report .r-tp .tp-m{font-size:10.5px;color:#8C857A;margin-top:2px}
+  #report .r-tp .tp-n{text-align:right;flex-shrink:0}
+  #report .r-tp .tp-n b{font-family:var(--disp);font-size:17px;display:block}
+  #report .r-tp .tp-n small{font-size:9.5px;color:#8C857A}
+  #report .r-rep{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  #report .r-rep .rp{border:1px solid #EAE4D9;border-radius:14px;padding:14px;text-align:center}
+  #report .r-rep .rp b{font-family:var(--disp);font-size:26px;display:block;margin-top:4px}
+  #report .r-rep .rp small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8C857A;font-weight:600}
+  #report .r-gline{height:3px;background:linear-gradient(90deg,#C4A265,#E9D9B4,transparent);border-radius:3px;margin:2px 0 18px}
   @media print{
-    @page{size:A4;margin:10mm}
-    html,body{width:190mm!important;margin:0 auto!important;background:#fff!important}
+    @page{size:A4;margin:11mm}
+    html,body{width:188mm!important;margin:0 auto!important;background:#fff!important}
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body>*{display:none!important}
     /* Le rapport s'ajuste à la zone imprimable A4, quel que soit l'appareil */
-    #report{display:block!important;position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:190mm!important;margin:0 auto!important;color:#1A1510;font-family:var(--sans);font-size:12px}
+    #report{display:block!important;position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:188mm!important;margin:0 auto!important;color:#1A1510;font-family:var(--sans);font-size:12px}
     #report *{max-width:100%;box-sizing:border-box}
-    #report .r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6mm}
+    #report .r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:5mm;margin-bottom:8mm}
     #report .r-kpi{padding:10px}
-    #report .r-kpi .k-n{font-size:22px}
-    #report .r-hero h1{font-size:26px}
-    #report .r-chart{height:60mm}
+    #report .r-kpi .k-n{font-size:21px}
+    #report .r-hero h1{font-size:25px}
+    #report .r-chart{height:58mm}
     #report .r-sec{break-inside:avoid;page-break-inside:avoid}
+    #report .r-pg1{page-break-after:always}
+    #report .r-pghead{display:flex!important}
   }
 </style>
 </head>
@@ -520,12 +552,12 @@
 
   <!-- DASH -->
   <section class="page on" id="dash">
-    <div class="shead"><div><div class="t" id="brandTitle">.HOSPIRE</div><div class="m"><span class="live">en direct</span> · Instagram · 30 derniers jours</div></div><button class="btn gold" onclick="openHospi()">✦ Demander à Hospi</button></div>
+    <div class="shead"><div><div class="t" id="brandTitle">.HOSPIRE</div><div class="m"><span class="live">en direct</span> · Tes réseaux · 30 derniers jours</div></div><button class="btn gold" onclick="openHospi()">✦ Demander à Hospi</button></div>
     <div class="band">
       <div class="cell"><div class="lbl">Abonnés</div><div class="num" id="d_foll">—</div><div class="delta">au total</div></div>
       <div class="cell"><div class="lbl">Croissance · 30j</div><div class="num" id="d_growth">—</div><div class="delta up">abonnés</div></div>
       <div class="cell"><div class="lbl">Portée · 30j</div><div class="num" id="d_reach">—</div><div class="delta">personnes touchées</div></div>
-      <div class="cell"><div class="lbl">Publications · 30j</div><div class="num" id="d_posts">—</div><div class="delta">Instagram</div></div>
+      <div class="cell"><div class="lbl">Publications · 30j</div><div class="num" id="d_posts">—</div><div class="delta">posts + Reels Instagram</div></div>
     </div>
     <div class="band" style="margin-top:14px">
       <div class="cell"><div class="lbl">Vues · 30j</div><div class="num" id="d_views">—</div><div class="delta">impressions</div></div>
@@ -545,10 +577,10 @@
     </div>
     <div class="card hoverable" style="margin-top:18px"><h3>Présence par réseau · 30 jours</h3>
       <div class="netgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
-        <div class="net"><span class="lg ig"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></span><div><b id="d_ignet">—</b><br><small>Instagram</small></div></div>
-        <div class="net"><span class="lg fb"><svg viewBox="0 0 24 24" width="19" height="19" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></span><div><b>—</b><br><small>Facebook</small></div></div>
-        <div class="net"><span class="lg tt"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span><div><b id="d_ttnet">—</b><br><small id="d_ttlbl">TikTok</small></div></div>
-        <div class="net"><span class="lg li"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span><div><b>—</b><br><small>LinkedIn</small></div></div>
+        <div class="net"><span class="lg ig"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></span><div><b id="d_ignet_f">—</b><br><small>Instagram · <span id="d_ignet_g">…</span></small></div></div>
+        <div class="net"><span class="lg fb"><svg viewBox="0 0 24 24" width="19" height="19" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></span><div><b id="d_fbnet_f">—</b><br><small>Facebook · <span id="d_fbnet_g">…</span></small></div></div>
+        <div class="net"><span class="lg tt"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span><div><b id="d_ttnet_f">—</b><br><small id="d_ttlbl">TikTok · <span id="d_ttnet_g">…</span></small></div></div>
+        <div class="net"><span class="lg li"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span><div><b id="d_linet_f">—</b><br><small>LinkedIn · <span id="d_linet_g">…</span></small></div></div>
       </div></div>
   </section>
 
@@ -578,7 +610,10 @@
     </div>
     <div class="subpage" id="c_story">
       <div class="g2">
-        <div class="card"><h3>Story Designer</h3>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><h3 style="margin:0">Story Designer</h3><span class="live">aperçu en direct</span></div>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 14px">Compose ta story en quelques secondes : ton visuel, ton texte, ton style — et publie.</p>
+          <div class="cstep"><span class="cnum">1</span><span>Ton message</span></div>
           <div class="field"><label>Texte de la story</label><input id="stText" value="Le brunch revient dimanche 🥐" oninput="stUpdate()"></div>
           <div class="field"><label>Importer un média (galerie)</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -586,6 +621,7 @@
               <button class="btn ghost sm" onclick="alert('Choisir depuis ta banque de contenus .HOSPIRE')">🖼️ Depuis ma banque</button>
             </div>
           </div>
+          <div class="cstep" style="margin-top:14px"><span class="cnum">3</span><span>Ton style</span></div>
           <div class="field"><label>Police</label><select id="stFont" onchange="stUpdate()"><option value="Fraunces">Élégante (serif)</option><option value="Inter">Moderne</option><option value="Georgia">Classique</option><option value="Trebuchet MS">Ronde</option></select></div>
           <div class="field"><label>Couleur du texte</label><div class="sw" id="stSw"></div></div>
           <div class="field"><label>Taille</label><input type="range" id="stSize" min="14" max="42" value="24" oninput="stUpdate()" style="width:100%"></div>
@@ -895,7 +931,7 @@
 </div></div>
 
 <div id="newResaModal"><div class="m">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" style="font-size:22px;font-weight:600">Nouvelle réservation</div><span onclick="document.getElementById('newResaModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" id="nr_title" style="font-size:22px;font-weight:600">Nouvelle réservation</div><span onclick="document.getElementById('newResaModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
   <div class="field"><label>Nom du client</label><input id="nr_name" placeholder="Fam. Bernard"></div>
   <div class="field"><label>Date et heure</label><input type="datetime-local" id="nr_dt"></div>
   <div class="field" id="nrf_presta" style="display:none"><label>Prestation</label><select id="nr_presta"></select></div>
@@ -910,7 +946,7 @@
   <div class="field"><label>Notes</label><input id="nr_notes" placeholder="Occasion, chaise bébé…"></div>
   <label style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--muted);margin:2px 0 10px;cursor:pointer"><input type="checkbox" id="nr_sendmail" checked style="width:auto"> Envoyer la confirmation par email au client</label>
   <div id="nr_res" style="font-size:13px;margin:4px 0 10px"></div>
-  <div style="display:flex;gap:10px"><button class="btn gold" style="flex:1" onclick="resaCreate()">Enregistrer</button><button class="btn ghost" onclick="document.getElementById('newResaModal').style.display='none'">Annuler</button></div>
+  <div style="display:flex;gap:10px"><button class="btn gold" id="nr_save" style="flex:1" onclick="resaCreate()">Enregistrer</button><button class="btn ghost" onclick="document.getElementById('newResaModal').style.display='none'">Annuler</button></div>
 </div></div>
 
 <div id="resaConfigModal"><div class="m">
@@ -935,11 +971,20 @@
 </div></div>
 
 <div id="composeModal" style="display:none;position:fixed;inset:0;z-index:57;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px">
-  <div class="m" style="background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:460px;max-width:100%;box-shadow:var(--shadow-lg)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" style="font-size:22px;font-weight:600">Nouveau post</div><span onclick="document.getElementById('composeModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
-    <div class="field" style="margin-bottom:6px"><label>Texte du post</label><textarea id="cpText" rows="4" placeholder="Écris ton post… ou laisse Hospi le faire ✦"></textarea></div>
-    <div style="margin-bottom:16px"><button class="btn gen sm" onclick="hospiCaption()">✦ Rédiger avec Hospi</button></div>
-    <div class="field"><label>Contenu (photos, carrousel ou vidéo)</label>
+  <div class="m" style="background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:520px;max-width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+      <div><div class="eyebrow" style="margin:0 0 4px">Créer du contenu</div><div class="disp" style="font-size:23px;font-weight:600">Nouveau post</div></div>
+      <span onclick="document.getElementById('composeModal').style.display='none'" style="cursor:pointer;color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--line);font-size:15px;flex-shrink:0">✕</span>
+    </div>
+    <div class="cstep"><span class="cnum">1</span><span>Ton texte</span></div>
+    <div class="hassist">
+      <div class="ha-top"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3FxlYgJDKCfLhRlFGA4Qt4ekYXA/hf_20260725_101724_148b0ef5-4ee0-4705-a3d9-1dfe4b019efa.png" alt="Hospi"><div><b>Laisse Hospi écrire pour toi</b><small>Décris ton contenu en 1-2 phrases : Hospi rédige la légende avec ta voix, ta ville et ton branding.</small></div></div>
+      <textarea id="cpBrief" rows="2" placeholder="Ex : photo de notre brunch du dimanche — pancakes, ambiance cosy. Envie de donner faim et d'inviter à réserver."></textarea>
+      <button class="btn gen sm" style="margin-top:8px" onclick="hospiCaption()">✦ Hospi rédige la légende</button>
+    </div>
+    <div class="field" style="margin:12px 0 18px"><label>Texte du post (publié tel quel)</label><textarea id="cpText" rows="4" placeholder="Écris ton post ici… ou utilise Hospi ci-dessus ✦"></textarea></div>
+    <div class="cstep"><span class="cnum">2</span><span>Tes visuels</span></div>
+    <div class="field" style="margin-bottom:18px">
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
         <label class="btn ghost sm" style="cursor:pointer">📷 Depuis ma galerie<input type="file" accept="image/*,video/*" multiple style="display:none" onchange="cpAddFiles(event)"></label>
         <button class="btn ghost sm" onclick="cpOpenBanque()">🖼️ Depuis la banque</button>
@@ -948,18 +993,20 @@
       <div id="cpMediaPrev" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <div id="cpBanquePick" style="display:none;gap:8px;flex-wrap:wrap;margin-top:10px;max-height:150px;overflow:auto"></div>
     </div>
-    <div class="field"><label>Réseaux</label>
-      <div class="netpick" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
-        <label class="netopt" title="Instagram" style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" class="cpNet" value="instagram" checked><svg viewBox="0 0 24 24" width="22" height="22" fill="#E1306C" style="flex-shrink:0"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg><span class="netlbl">Instagram</span></label>
-        <label class="netopt" title="TikTok" style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" class="cpNet" value="tiktok"><svg viewBox="0 0 24 24" width="20" height="20" fill="#0A0A0A" style="flex-shrink:0"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg><span class="netlbl">TikTok</span></label>
-        <label class="netopt" title="Facebook" style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" class="cpNet" value="facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2" style="flex-shrink:0"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg><span class="netlbl">Facebook</span></label>
-        <label class="netopt" title="LinkedIn" style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" class="cpNet" value="linkedin"><svg viewBox="0 0 24 24" width="21" height="21" fill="#0A66C2" style="flex-shrink:0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span class="netlbl">LinkedIn</span></label>
-        <label class="netopt" title="X (Twitter)" style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" class="cpNet" value="twitter"><svg class="xlogo" viewBox="0 0 24 24" width="19" height="19" fill="#0A0A0A" style="flex-shrink:0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span class="netlbl">X</span></label>
+    <div class="cstep"><span class="cnum">3</span><span>Tes réseaux</span></div>
+    <div class="field" style="margin-bottom:18px">
+      <div class="netpick">
+        <label class="netopt on" title="Instagram"><input type="checkbox" class="cpNet" value="instagram" checked><svg viewBox="0 0 24 24" width="22" height="22" fill="#E1306C" style="flex-shrink:0"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg><span class="netlbl">Instagram</span><span class="nck">✓</span></label>
+        <label class="netopt" title="TikTok"><input type="checkbox" class="cpNet" value="tiktok"><svg viewBox="0 0 24 24" width="20" height="20" fill="#0A0A0A" style="flex-shrink:0"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg><span class="netlbl">TikTok</span><span class="nck">✓</span></label>
+        <label class="netopt" title="Facebook"><input type="checkbox" class="cpNet" value="facebook"><svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2" style="flex-shrink:0"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg><span class="netlbl">Facebook</span><span class="nck">✓</span></label>
+        <label class="netopt" title="LinkedIn"><input type="checkbox" class="cpNet" value="linkedin"><svg viewBox="0 0 24 24" width="21" height="21" fill="#0A66C2" style="flex-shrink:0"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span class="netlbl">LinkedIn</span><span class="nck">✓</span></label>
+        <label class="netopt" title="X (Twitter)"><input type="checkbox" class="cpNet" value="twitter"><svg class="xlogo" viewBox="0 0 24 24" width="19" height="19" fill="#0A0A0A" style="flex-shrink:0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span class="netlbl">X</span><span class="nck">✓</span></label>
       </div>
     </div>
-    <div class="field"><label>Date et heure</label><input type="datetime-local" id="cpDate"></div>
+    <div class="cstep"><span class="cnum">4</span><span>Programmation</span></div>
+    <div class="field"><label>Date et heure de publication</label><input type="datetime-local" id="cpDate"></div>
     <div id="cpRes" style="font-size:13px;margin:6px 0 12px;color:var(--muted)"></div>
-    <div style="display:flex;gap:10px"><button class="btn ghost" style="flex:1" onclick="publishPost(true)">Enregistrer en brouillon</button><button class="btn gold" style="flex:1" onclick="publishPost(false)">Programmer</button></div>
+    <div style="display:flex;gap:10px;border-top:1px solid var(--line);padding-top:16px;margin-top:4px"><button class="btn ghost" style="flex:1" onclick="publishPost(true)">Enregistrer en brouillon</button><button class="btn gold" style="flex:1.2" onclick="publishPost(false)">✓ Programmer</button></div>
   </div>
 </div>
 
@@ -1183,8 +1230,17 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
     var fv=(foll&&foll.data&&foll.data[0]&&foll.data[0].values)||[];
     var s=ser(fv).sort(function(a,b){return new Date(a.x)-new Date(b.x);});
     var last=s.length?s[s.length-1].y:null,first=s.length?s[0].y:null;$('d_foll').textContent=fmt(last);
-    var g=(last!=null&&first!=null)?(last-first):null,gs=(g==null?'—':((g>=0?'+':'')+g));$('d_growth').textContent=gs;$('d_ignet').textContent=gs;
-    var posts=await api('postsIg',{blogId:cur,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});var arr=pArr(posts);
+    var g=(last!=null&&first!=null)?(last-first):null,gs=(g==null?'—':((g>=0?'+':'')+g));$('d_growth').textContent=gs;
+    /* Publications = posts du feed + Reels (Metricool les sépare : sans les Reels, rien ne colle avec Meta) */
+    var _pr=await Promise.all([
+      api('postsIg',{blogId:cur,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'}),
+      api('reelsIg',{blogId:cur,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'})
+    ]);
+    var arr=pArr(_pr[0]);
+    var reels=pArr(_pr[1]).map(function(p){if(!p.type)p.type='REEL';return p;});
+    var seenIds={};arr.forEach(function(p){if(p&&p.postId)seenIds[p.postId]=1;});
+    reels.forEach(function(p){if(!(p&&p.postId&&seenIds[p.postId]))arr.push(p);});
+    arr.sort(function(a,b){var da=(a.publishedAt&&a.publishedAt.dateTime)||'',db=(b.publishedAt&&b.publishedAt.dateTime)||'';return db<da?-1:1;});
     var reachVal=sumF(arr,['reach','impressions','views']);
     $('d_posts').textContent=fmt(arr.length);$('d_reach').textContent=fmt(reachVal);draw(s);
     var tip=(g!=null&&g>0)?"belle progression cette semaine 👏":"on lance des Reels pour faire décoller ça ?";$('insightMsg').innerHTML="<b>Hospi —</b> "+tip;
@@ -1204,6 +1260,7 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
   function _ptype(t){t=String(t||'').toUpperCase();if(t.indexOf('REEL')>=0||t.indexOf('VIDEO')>=0)return 'Reel';if(t.indexOf('CAROUSEL')>=0||t.indexOf('ALBUM')>=0)return 'Carrousel';return 'Photo';}
   function renderBilanStats(arr){
     arr=arr||[];
+    window.__bilanArr=arr;
     var inter=0,reachS=0,saved=0,shares=0;
     arr.forEach(function(p){
       var it=_num(p,'interactions');if(!it)it=_num(p,'likes')+_num(p,'comments')+_num(p,'saved')+_num(p,'shares');
@@ -1233,32 +1290,57 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
   }
   function clampN(v,a,b){return Math.max(a,Math.min(b,v));}
   async function loadAccountMetrics(bid){
-    async function acc(metric){var j=await api('timeline',{blogId:bid,network:'instagram',subject:'account',metric:metric,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});var v=(j&&j.data&&j.data[0]&&j.data[0].values)||[];return v.reduce(function(a,p){return a+(+(p.value)||0);},0);}
-    var reach=await acc('reach'), views=await acc('views'), eng=await acc('accounts_engaged'), inter=await acc('postsInteractions');
+    async function accS(metric){var j=await api('timeline',{blogId:bid,network:'instagram',subject:'account',metric:metric,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
+      var v=(j&&j.data&&j.data[0]&&j.data[0].values)||[];
+      var s=v.map(function(p){return {x:String(p.dateTime||''),y:+p.value};}).filter(function(p){return !isNaN(p.y);}).sort(function(a,b){return new Date(a.x)-new Date(b.x);});
+      return {sum:s.reduce(function(a,p){return a+p.y;},0),series:s};}
+    var mReach=await accS('reach'), mViews=await accS('views'), mEng=await accS('accounts_engaged'), mInter=await accS('postsInteractions');
+    var reach=mReach.sum, views=mViews.sum, eng=mEng.sum, inter=mInter.sum;
     if($('d_reach')&&reach)$('d_reach').textContent=fmt(reach);
+    if($('b_reach')&&reach)$('b_reach').textContent=fmt(reach);
     if($('d_views'))$('d_views').textContent=fmt(views);
     if($('d_inter'))$('d_inter').textContent=fmt(inter);
     if($('d_engaged'))$('d_engaged').textContent=fmt(eng);
     var rate=reach>0?(inter/reach*100):null;
     if($('d_engrate'))$('d_engrate').textContent=(rate==null?'—':rate.toFixed(1)+'%');
     window.__acc={reach:reach,views:views,inter:inter,eng:eng,rate:rate};
+    window.__accSeries={reach:mReach.series,views:mViews.series};
     computeScore();
-    loadTiktokPresence(bid);
+    loadNetPresence(bid);
   }
-  async function loadTiktokPresence(bid){
-    var el=$('d_ttnet');if(!el)return;
+  /* ---- Présence réelle par réseau (abonnés + variation 30j) ---- */
+  async function netFollowers(bid,network,metric){
     try{
-      // TikTok ne fournit de façon fiable QUE les abonnés et les j'aime (le reste est indisponible côté TikTok)
-      var ttf=await api('timeline',{blogId:bid,network:'tiktok',subject:'account',metric:'followers_count',start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
-      var tv=(((ttf&&ttf.data)||[])[0]&&ttf.data[0].values||[]).map(function(p){return {t:new Date(p.dateTime),y:+p.value};}).filter(function(p){return !isNaN(p.y);}).sort(function(a,b){return a.t-b.t;});
-      if(!tv.length){el.textContent='—';return;}
-      var lastF=tv[tv.length-1].y,firstF=tv[0].y,g=lastF-firstF;
-      el.textContent=(g>=0?'+':'')+g;
-      var ttl=await api('timeline',{blogId:bid,network:'tiktok',subject:'account',metric:'likes',start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
-      var likes=(((ttl&&ttl.data)||[])[0]&&ttl.data[0].values||[]).reduce(function(a,p){return a+(+p.value||0);},0);
-      window.__tt={followers:lastF,growth:g,likes:likes};
-      var netdiv=el.closest('.net');if(netdiv)netdiv.title='TikTok · '+fmt(lastF)+' abonnés · '+fmt(likes)+" j'aime (30j)";
-    }catch(e){el.textContent='—';}
+      var j=await api('timeline',{blogId:bid,network:network,subject:'account',metric:metric,start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
+      var v=(j&&j.data&&j.data[0]&&j.data[0].values)||[];
+      var s=v.map(function(p){return {t:new Date(p.dateTime),y:+p.value};}).filter(function(p){return !isNaN(p.y);}).sort(function(a,b){return a.t-b.t;});
+      if(!s.length)return null;
+      return {foll:s[s.length-1].y,growth:s[s.length-1].y-s[0].y};
+    }catch(e){return null;}
+  }
+  function paintNet(pfx,d,extra){
+    var f=$(pfx+'_f'),g=$(pfx+'_g');
+    if(!f)return;
+    if(!d){f.textContent='—';if(g)g.textContent='non connecté';return;}
+    f.textContent=fmt(d.foll);
+    if(g)g.innerHTML='<span style="color:'+(d.growth>=0?'var(--vert,#2E9E6B)':'var(--rouge,#C9564F)')+';font-weight:700">'+(d.growth>=0?'+':'')+d.growth+'</span> · 30j'+(extra?(' · '+extra):'');
+  }
+  async function loadNetPresence(bid){
+    var ig=await netFollowers(bid,'instagram','followers');
+    paintNet('d_ignet',ig);
+    var tt=await netFollowers(bid,'tiktok','followers_count');
+    var ttExtra='';
+    if(tt){
+      try{
+        var ttl=await api('timeline',{blogId:bid,network:'tiktok',subject:'account',metric:'likes',start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
+        var likes=(((ttl&&ttl.data)||[])[0]&&ttl.data[0].values||[]).reduce(function(a,p){return a+(+p.value||0);},0);
+        if(likes)ttExtra=fmt(likes)+" ❤";
+        window.__tt={followers:tt.foll,growth:tt.growth,likes:likes};
+      }catch(e){}
+    }
+    paintNet('d_ttnet',tt,ttExtra);
+    paintNet('d_fbnet',await netFollowers(bid,'facebook','followers'));
+    paintNet('d_linet',await netFollowers(bid,'linkedin','followers'));
   }
   async function loadBestTimes(bid){
     var box=$('d_besttimes');if(!box)return;
@@ -1487,12 +1569,17 @@ async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 window.doLogin=doLogin; window.demoMode=demoMode; window.doLogout=doLogout;
 
 /* ---- Composer / publier un post ---- */
+/* chips réseaux : synchronise l'état visuel avec les cases cachées */
+window.syncNetChips=function(){document.querySelectorAll('.netopt').forEach(function(l){var c=l.querySelector('.cpNet');if(c)l.classList.toggle('on',!!c.checked);});};
+document.querySelectorAll('.netopt .cpNet').forEach(function(c){c.addEventListener('change',window.syncNetChips);});
 window.openCompose=function(){
   window.__editId=null;
   var d=document.getElementById('cpDate');var t=new Date(Date.now()+864e5);t.setHours(19,0,0,0);if(d)d.value=t.toISOString().slice(0,16);
   window.__cpMedia=[];document.getElementById('cpMediaPrev').innerHTML='';var bp=document.getElementById('cpBanquePick');if(bp){bp.style.display='none';bp.innerHTML='';}
   document.getElementById('cpText').value='';
+  var br=document.getElementById('cpBrief');if(br)br.value='';
   document.querySelectorAll('.cpNet').forEach(function(c,i){c.checked=(i===0);});
+  window.syncNetChips();
   document.querySelector('#composeModal .disp').textContent='Nouveau post';
   document.getElementById('cpRes').textContent='';document.getElementById('composeModal').style.display='flex';};
 window.publishPost=async function(draft){
@@ -1569,18 +1656,19 @@ window.cpOpenBanque=async function(){
 };
 window.__hospiAsked=false;
 window.hospiCaption=async function(){
-  var ta=document.getElementById('cpText'),brief=ta.value.trim(),res=document.getElementById('cpRes');
+  var ta=document.getElementById('cpText'),res=document.getElementById('cpRes');
+  var bf=document.getElementById('cpBrief');
+  var brief=(bf&&bf.value.trim())||ta.value.trim();
   var brand=document.getElementById('brandTitle')?document.getElementById('brandTitle').textContent:'le restaurant';
   var nets=[].slice.call(document.querySelectorAll('.cpNet:checked')).map(function(x){return x.value;});
   // Sans contexte, Hospi ne doit pas inventer : elle demande d'abord de quoi parle le contenu.
   if(!brief){
     res.style.color='#b07d1e';
-    res.innerHTML='✦ <b>Hospi :</b> décris-moi ton contenu dans le champ ci-dessus (le plat, l\'ambiance, l\'occasion, la promo…), puis reclique — je rédige une légende adaptée à TON post.';
-    ta.setAttribute('placeholder','Ex : photo de notre brunch du dimanche — œufs bénédicte, pancakes, ambiance cosy et ensoleillée. Envie de donner faim et d\'inviter à réserver.');
-    ta.focus();window.__hospiAsked=true;
+    res.innerHTML='✦ <b>Hospi :</b> décris ton contenu dans le champ « Laisse Hospi écrire pour toi » (le plat, l\'ambiance, l\'occasion…) — je rédige une légende adaptée à TON post, avec ton branding.';
+    if(bf)bf.focus();window.__hospiAsked=true;
     return;
   }
-  res.style.color='var(--muted)';res.textContent='Hospi rédige à partir de ton contexte…';
+  res.style.color='var(--muted)';res.textContent='Hospi rédige à partir de ton contexte et de ton branding…';
   try{
     var r=await fetch('/api/hospi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vertical:(document.body.classList.contains('beauty')?'beauty':'resto'),brief:brief,brand:brand,network:(nets[0]||'Instagram'),profile:window.__brandProfile||{},lang:(window.__lang||"fr")})});
     var j=await r.json();
@@ -1598,8 +1686,13 @@ window.loadPosts=async function(){
   function pfmt(n){if(n==null||isNaN(n))return '—';n=Math.round(n);return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'K':''+n;}
   try{
     var to=new Date(),from=new Date(Date.now()-120*864e5);
-    var r=await fetch('/api/hub?action=postsIg&blogId='+encodeURIComponent(window.currentBlog||'')+'&start='+isod(from)+'T00:00:00&end='+isod(to)+'T23:59:59&_='+Date.now());
-    var j=await r.json();var arr=(j&&j.data)||[];arr=Array.isArray(arr)?arr:[];
+    var qs='&blogId='+encodeURIComponent(window.currentBlog||'')+'&start='+isod(from)+'T00:00:00&end='+isod(to)+'T23:59:59&_='+Date.now();
+    var rs=await Promise.all([fetch('/api/hub?action=postsIg'+qs),fetch('/api/hub?action=reelsIg'+qs)]);
+    var j=await rs[0].json();var arr=(j&&j.data)||[];arr=Array.isArray(arr)?arr:[];
+    try{var j2=await rs[1].json();var arr2=(j2&&j2.data)||[];arr2=Array.isArray(arr2)?arr2:[];
+      var ids={};arr.forEach(function(p){if(p&&p.postId)ids[p.postId]=1;});
+      arr2.forEach(function(p){if(!(p&&p.postId&&ids[p.postId])){if(!p.type)p.type='REEL';arr.push(p);}});
+    }catch(e){}
     arr.sort(function(a,b){return new Date((b.publishedAt&&b.publishedAt.dateTime)||0)-new Date((a.publishedAt&&a.publishedAt.dateTime)||0);});
     window.__postsLoaded=true;
     if(!arr.length){box.innerHTML='<div style="color:var(--muted);font-size:14px;line-height:1.6">Aucune publication récente pour le moment.<br>Elles apparaîtront ici <b>automatiquement</b> dès que tu publies (depuis l\'app ou Instagram), avec leurs stats en direct.</div>';return;}
@@ -1776,6 +1869,7 @@ function editWithPost(p){
   var d=schedDate(p);if(d)document.getElementById('cpDate').value=String(d).slice(0,16);
   var nets=(p.providers||[]).map(function(x){return x.network;});
   document.querySelectorAll('.cpNet').forEach(function(c){c.checked=nets.indexOf(c.value)>=0;});
+  if(window.syncNetChips)window.syncNetChips();
   window.__cpMedia=(p.media||[]).slice();
   var prev=document.getElementById('cpMediaPrev');prev.innerHTML='';
   window.__cpMedia.forEach(function(u){var dv=document.createElement('div');dv.style.cssText='width:66px;height:66px;border-radius:12px;overflow:hidden';dv.innerHTML=thumbEl(u);prev.appendChild(dv);});
@@ -1800,31 +1894,70 @@ if('serviceWorker' in navigator){window.addEventListener('load',function(){navig
 /* ---- Rapport PDF mensuel ---- */
 window.downloadReport=function(){
   var $=function(id){return document.getElementById(id);};
-  var r=window.__rep||{};
+  var r=window.__rep||{},acc=window.__acc||{};
   function fmtN(n){if(n==null||isNaN(n))return '—';n=Math.round(n);return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'K':''+n;}
-  function lab(x){x=String(x);if(/^\d{13}$/.test(x)){var d=new Date(+x);return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}if(/^\d{8}$/.test(x))return x.slice(6,8)+'/'+x.slice(4,6);return x.slice(-5);}
+  function num(p,n){return (p&&p[n]!=null&&!isNaN(+p[n]))?+p[n]:0;}
+  function lab(x){x=String(x);var m=x.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[3]+'/'+m[2];if(/^\d{13}$/.test(x)){var d=new Date(+x);return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}if(/^\d{8}$/.test(x))return x.slice(6,8)+'/'+x.slice(4,6);return x.slice(-5);}
   var mois=new Date().toLocaleDateString((window.__loc||'fr-FR'),{month:'long',year:'numeric'});mois=mois.charAt(0).toUpperCase()+mois.slice(1);
   var name=($('brandTitle')&&$('brandTitle').textContent)||'';
   var g=(r.growth==null?0:r.growth);
   $('repMeta').innerHTML=(name?name+'<br>':'')+mois;
+  if($('repMeta2'))$('repMeta2').innerHTML=(name?name+'<br>':'')+mois;
   $('repH1').textContent='Bilan mensuel — '+mois;
   $('rk1').textContent=(g>=0?'+':'')+g;
-  $('rk2').textContent=fmtN(r.reach);
+  $('rk2').textContent=fmtN(acc.reach||r.reach);
   $('rk3').textContent=fmtN(r.posts);
   $('rk4').textContent=fmtN(r.foll);
+  /* KPIs détaillés (mêmes chiffres que l'écran Bilan) */
+  var arr=window.__bilanArr||[];
+  var inter=0,saved=0,shares=0;
+  arr.forEach(function(p){var it=num(p,'interactions')||(num(p,'likes')+num(p,'comments')+num(p,'saved')+num(p,'shares'));inter+=it;saved+=num(p,'saved');shares+=num(p,'shares');});
+  if($('rk5'))$('rk5').textContent=fmtN(acc.inter||inter);
+  if($('rk6'))$('rk6').textContent=(acc.rate!=null?acc.rate.toFixed(1)+'%':'—');
+  if($('rk7'))$('rk7').textContent=fmtN(saved);
+  if($('rk8'))$('rk8').textContent=fmtN(shares);
   $('repWord').textContent=($('b_hospi')&&$('b_hospi').textContent)||'';
+  /* Top publications (page 2) */
+  var top=$('repTop');
+  if(top){
+    var sorted=arr.slice().sort(function(a,b){var ia=num(a,'interactions')||(num(a,'likes')+num(a,'comments')+num(a,'saved')+num(a,'shares'));var ib=num(b,'interactions')||(num(b,'likes')+num(b,'comments')+num(b,'saved')+num(b,'shares'));return ib-ia;}).slice(0,5);
+    if(!sorted.length)top.innerHTML='<div style="font-size:12px;color:#8C857A">Aucune publication sur la période.</div>';
+    else top.innerHTML=sorted.map(function(p,i){
+      var it=num(p,'interactions')||(num(p,'likes')+num(p,'comments')+num(p,'saved')+num(p,'shares'));
+      var t=String(p.type||'').toUpperCase();var ty=(t.indexOf('REEL')>=0||t.indexOf('VIDEO')>=0)?'Reel':(t.indexOf('CAROUSEL')>=0||t.indexOf('ALBUM')>=0)?'Carrousel':'Photo';
+      var dt=(p.publishedAt&&p.publishedAt.dateTime)||'';var m=String(dt).match(/(\d{4})-(\d{2})-(\d{2})/);var dd=m?(m[3]+'/'+m[2]):'';
+      var txt=_esc(String(p.content||'').replace(/\s+/g,' ').slice(0,70));
+      return '<div class="r-tp"><span class="tp-rank">'+(i+1)+'</span><div class="tp-main"><div class="tp-t">'+(txt||'(sans légende)')+'</div><div class="tp-m">'+ty+' · '+dd+' · ❤️ '+fmtN(num(p,'likes'))+' · 💬 '+fmtN(num(p,'comments'))+' · 🔖 '+fmtN(num(p,'saved'))+' · 👁 '+fmtN(num(p,'reach'))+'</div></div><div class="tp-n"><b>'+fmtN(it)+'</b><small>interactions</small></div></div>';
+    }).join('');
+  }
+  /* Réputation (page 2) */
+  var rv=window.__reviews||[];
+  var rated=rv.filter(function(x){return +x.stars;});
+  var avg=rated.length?(rated.reduce(function(a,x){return a+(+x.stars||0);},0)/rated.length):null;
+  var pend=rv.filter(function(x){return (x.status||'').toUpperCase()==='PENDING';}).length;
+  if($('rp_avg'))$('rp_avg').textContent=(avg!=null?avg.toFixed(1)+' ★':'—');
+  if($('rp_count'))$('rp_count').textContent=(rv.length||'—');
+  if($('rp_pending'))$('rp_pending').textContent=(rv.length?pend:'—');
   var recos=[];
   recos.push(g>0?'Capitaliser sur les formats qui ont fonctionné ce mois-ci et garder le rythme de publication.':'Publier 2 Reels courts cette semaine pour relancer la portée.');
-  recos.push('Répondre à 100 % des avis et messages sous 24 h pour renforcer la relation client.');
-  recos.push('Publier aux créneaux à forte audience (ex. mardi 12h30, jeudi 19h00).');
+  recos.push(pend>0?('Répondre aux '+pend+' avis Google en attente sous 24 h pour renforcer la réputation.'):'Répondre à 100 % des avis et messages sous 24 h pour renforcer la relation client.');
+  recos.push('Publier aux créneaux à forte audience identifiés dans « Meilleurs moments pour publier ».');
   $('repRecos').innerHTML=recos.map(function(x){return '<li>'+x+'</li>';}).join('');
   $('repFoot').textContent='.HOSPIRE PRO · pro.hospireclub.com · Généré le '+new Date().toLocaleDateString((window.__loc||'fr-FR'));
   try{
     var c=$('repChart');var s=r.series||[];
     if(window.__repChart)window.__repChart.destroy();
     c.width=680;c.height=220;
-    var _ac=chartAccent();var ctx=c.getContext('2d');var grad=ctx.createLinearGradient(0,0,0,210);grad.addColorStop(0,'rgba('+_ac.rgb+',.30)');grad.addColorStop(1,'rgba('+_ac.rgb+',0)');
-    window.__repChart=new Chart(c,{type:'line',data:{labels:s.map(function(p){return lab(p.x);}),datasets:[{data:s.map(function(p){return p.y;}),borderColor:_ac.line,backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:false,animation:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:8}}}}});
+    var ctx=c.getContext('2d');var grad=ctx.createLinearGradient(0,0,0,210);grad.addColorStop(0,'rgba(196,162,101,.30)');grad.addColorStop(1,'rgba(196,162,101,0)');
+    window.__repChart=new Chart(c,{type:'line',data:{labels:s.map(function(p){return lab(p.x);}),datasets:[{data:s.map(function(p){return p.y;}),borderColor:'#C4A265',backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:false,animation:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:8}}}}});
+  }catch(e){}
+  try{
+    var c2=$('repChart2');var s2=(window.__accSeries&&window.__accSeries.reach)||[];
+    if(window.__repChart2)window.__repChart2.destroy();
+    if(c2&&s2.length){
+      c2.width=680;c2.height=160;
+      window.__repChart2=new Chart(c2,{type:'bar',data:{labels:s2.map(function(p){return lab(p.x);}),datasets:[{data:s2.map(function(p){return p.y;}),backgroundColor:'rgba(196,162,101,.55)',borderColor:'#C4A265',borderWidth:1,borderRadius:3}]},options:{responsive:false,animation:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:10}}}}});
+    }
   }catch(e){}
   setTimeout(function(){window.print();},500);
 };
@@ -1932,6 +2065,7 @@ window.openResaReal=function(id){
   if(x.status==='arrived')acts.push('<button class="btn ghost sm" style="flex:1;min-width:120px" onclick="resaSetStatus(\'confirmed\')">↩ Annuler l\'arrivée</button>');
   if(late&&x.email)acts.push('<button class="btn sm" style="flex:1;min-width:120px;background:var(--rouge,#C9564F);color:#fff;border:none" onclick="resaRemind()">⏰ Rappeler le client</button>');
   if(x.status==='confirmed'||late)acts.push('<button class="btn ghost sm" style="color:#8C857A" onclick="resaNoShow()">🚫 No-show</button>');
+  if(x.status!=='cancelled')acts.push('<button class="btn ghost sm" style="border-color:var(--gold,#C4A265);color:#7a5f22" onclick="resaEdit()">✏️ Modifier</button>');
   acts.push('<button class="btn ghost sm" onclick="contactResa()">📞 Contacter</button>');
   acts.push('<button class="btn ghost sm" onclick="resaRefuse()">Refuser / Annuler</button>');
   acts.push('<button class="btn ghost sm" onclick="resaDelete()" title="Supprimer">🗑</button>');
@@ -2041,6 +2175,7 @@ window.resaDelete=async function(){
   document.getElementById('resaModal').style.display='none';loadResa();
 };
 window.openNewResa=async function(){
+  window.__editResaId=null;
   var t=new Date(Date.now()+864e5);t.setHours(20,0,0,0);
   var f=document.getElementById('nr_dt');if(f)f.value=t.toISOString().slice(0,16);
   ['nr_name','nr_phone','nr_email','nr_allergens','nr_notes'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
@@ -2060,19 +2195,52 @@ window.openNewResa=async function(){
     document.getElementById('nrf_allergens').style.display='none';
     setTimeout(applyBeautyTerms,0);
   }
+  var tt=document.getElementById('nr_title');if(tt)tt.textContent='Nouvelle réservation';
+  var sv=document.getElementById('nr_save');if(sv)sv.textContent='Enregistrer';
+  if(_isBeauty())setTimeout(applyBeautyTerms,0);
   document.getElementById('newResaModal').style.display='flex';
 };
-async function findFreeTable(tables,startISO,endISO){
+/* Modifier une réservation / un rendez-vous : mêmes champs, mêmes contrôles anti double-booking */
+window.resaEdit=async function(){
+  var x=(__resaCache||[]).filter(function(r){return r.id===__resaId;})[0];if(!x)return;
+  document.getElementById('resaModal').style.display='none';
+  await openNewResa();
+  window.__editResaId=x.id;
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.value=(v==null?'':v);};
+  var d=new Date(x.date_time),pad=function(n){return ('0'+n).slice(-2);};
+  set('nr_dt',d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()));
+  set('nr_name',x.name);set('nr_phone',x.phone);set('nr_email',x.email);set('nr_notes',x.notes);
+  var src=document.getElementById('nr_src');if(src&&x.source){var ok=false;[].forEach.call(src.options,function(o){if(o.value===x.source)ok=true;});if(ok)src.value=x.source;}
+  if(_isBeauty()){
+    var ps=document.getElementById('nr_presta');
+    if(ps&&x.service){[].forEach.call(ps.options,function(o){if((o.getAttribute('data-name')||'')===x.service)ps.value=o.value;});}
+    var ss=document.getElementById('nr_staff');if(ss)ss.value=(x.staff_id!=null?String(x.staff_id):'');
+  }else{
+    set('nr_allergens',x.allergens);
+    var ad=(x.adults!=null?+x.adults:((+x.covers)||2)),ch=(x.children!=null?+x.children:0);
+    document.getElementById('nr_adults').value=ad||1;document.getElementById('nr_children').value=ch;
+  }
+  var tt2=document.getElementById('nr_title');if(tt2)tt2.textContent=_isBeauty()?'Modifier le rendez-vous':'Modifier la réservation';
+  var sv2=document.getElementById('nr_save');if(sv2)sv2.textContent='Enregistrer les modifications';
+  var wm=document.getElementById('nr_sendmail');if(wm)wm.checked=false;
+  document.getElementById('nr_res').textContent='';
+  if(_isBeauty())setTimeout(applyBeautyTerms,0);
+};
+async function findFreeTable(tables,startISO,endISO,excludeId){
   for(var i=0;i<tables.length;i++){var t=tables[i];
-    try{var r=await sb.from('reservations').select('id').eq('table_id',t.id).neq('status','cancelled').lt('date_time',endISO).gt('end_time',startISO).limit(1);
+    try{var q=sb.from('reservations').select('id').eq('table_id',t.id).neq('status','cancelled').lt('date_time',endISO).gt('end_time',startISO);
+      if(excludeId)q=q.neq('id',excludeId);
+      var r=await q.limit(1);
       if(!r.error&&(!r.data||!r.data.length))return t.id;
     }catch(e){}
   }
   return null;
 }
-async function findFreeStaff(cands,startISO,endISO){
+async function findFreeStaff(cands,startISO,endISO,excludeId){
   for(var i=0;i<cands.length;i++){var s=cands[i];
-    try{var r=await sb.from('reservations').select('id').eq('staff_id',s.id).neq('status','cancelled').lt('date_time',endISO).gt('end_time',startISO).limit(1);
+    try{var q=sb.from('reservations').select('id').eq('staff_id',s.id).neq('status','cancelled').lt('date_time',endISO).gt('end_time',startISO);
+      if(excludeId)q=q.neq('id',excludeId);
+      var r=await q.limit(1);
       if(!r.error&&(!r.data||!r.data.length))return s.id;
     }catch(e){}
   }
@@ -2099,6 +2267,8 @@ async function resaCreateBeauty(){
   var ps=document.getElementById('nr_presta');var po=ps&&ps.options[ps.selectedIndex];
   var dur=po?(parseInt(po.value,10)||0):0;var service=po?(po.getAttribute('data-name')||''):'';
   var staffId=(document.getElementById('nr_staff')&&document.getElementById('nr_staff').value)||'';
+  var editId=window.__editResaId||null;
+  var prev=editId?(__resaCache||[]).filter(function(r){return r.id===editId;})[0]:null;
   if(!name||!dt){res.style.color='var(--rouge)';res.textContent='Indique au moins le nom et la date.';return;}
   if(!dur){res.style.color='var(--rouge)';res.textContent='Choisis une prestation.';return;}
   if(typeof sb==='undefined'||!sb||!window.currentBlog){res.style.color='var(--rouge)';res.textContent='Connecte-toi pour enregistrer.';return;}
@@ -2111,11 +2281,19 @@ async function resaCreateBeauty(){
   var cands=(window.__resaStaff||[]).filter(function(s){return s.active!==false;});
   if(staffId)cands=cands.filter(function(s){return String(s.id)===String(staffId);});
   if(!cands.length){res.style.color='var(--rouge)';res.textContent='Ajoute au moins un·e praticien·ne dans la configuration.';return;}
-  var freeId=await findFreeStaff(cands,startISO,endISO);
+  var freeId=null;
+  if(prev&&prev.staff_id&&(!staffId||String(staffId)===String(prev.staff_id))){
+    try{var oc=await sb.from('reservations').select('id').eq('staff_id',prev.staff_id).neq('status','cancelled').neq('id',editId).lt('date_time',endISO).gt('end_time',startISO).limit(1);
+      if(!oc.error&&(!oc.data||!oc.data.length))freeId=prev.staff_id;
+    }catch(e){}
+  }
+  if(!freeId)freeId=await findFreeStaff(cands,startISO,endISO,editId);
   if(!freeId){res.style.color='var(--rouge)';res.textContent='Complet à cette heure pour cette prestation.';return;}
-  var payload={blog_id:window.currentBlog,name:name,phone:phone,email:email,contact:(phone||email),adults:1,children:0,covers:1,date_time:startISO,end_time:endISO,source:src,notes:notes,status:'confirmed',consent:true,staff_id:freeId,service:service,service_dur:dur};
+  var payload={blog_id:window.currentBlog,name:name,phone:phone,email:email,contact:(phone||email),adults:1,children:0,covers:1,date_time:startISO,end_time:endISO,source:src,notes:notes,status:(prev?prev.status:'confirmed'),consent:true,staff_id:freeId,service:service,service_dur:dur};
   try{
-    var r=await sb.from('reservations').insert(payload);
+    var r;
+    if(editId){delete payload.consent;r=await sb.from('reservations').update(payload).eq('id',editId);}
+    else r=await sb.from('reservations').insert(payload);
     if(r.error){var m=r.error.message||'';res.style.color='var(--rouge)';res.textContent=(m.indexOf('no_overlap')>=0)?"Ce créneau vient d'être pris. Choisis une autre heure.":('Erreur : '+m);return;}
     var wantMail=document.getElementById('nr_sendmail');
     if(email&&wantMail&&wantMail.checked){
@@ -2123,7 +2301,8 @@ async function resaCreateBeauty(){
       var sname=_staffName(freeId);
       fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'notify',beauty:true,blogId:window.currentBlog,brandName:brand,name:name,email:email,dt:startISO,service:service,staff:sname})}).catch(function(){});
     }
-    res.style.color='var(--vert)';res.textContent='✓ Rendez-vous enregistré'+(email&&wantMail&&wantMail.checked?' · email envoyé':'')+' !';
+    res.style.color='var(--vert)';res.textContent=(editId?'✓ Rendez-vous modifié':'✓ Rendez-vous enregistré')+(email&&wantMail&&wantMail.checked?' · email envoyé':'')+' !';
+    window.__editResaId=null;
     setTimeout(function(){document.getElementById('newResaModal').style.display='none';},900);
     loadResa();
   }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}
@@ -2142,23 +2321,38 @@ window.resaCreate=async function(){
   var turn=(window.__resaCfg&&window.__resaCfg.turn)||90;
   var endISO=new Date(new Date(startISO).getTime()+turn*60000).toISOString();
   if((!window.__resaTables||!window.__resaTables.length)&&typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}}
-  var payload={blog_id:window.currentBlog,name:name,phone:phone,email:email,contact:(phone||email),adults:adults,children:children,covers:party,date_time:startISO,end_time:endISO,source:src,allergens:allerg,notes:notes,status:'confirmed',consent:true};
+  var editId=window.__editResaId||null;
+  var prev=editId?(__resaCache||[]).filter(function(r){return r.id===editId;})[0]:null;
+  var payload={blog_id:window.currentBlog,name:name,phone:phone,email:email,contact:(phone||email),adults:adults,children:children,covers:party,date_time:startISO,end_time:endISO,source:src,allergens:allerg,notes:notes,status:(prev?prev.status:'confirmed'),consent:true};
   var tables=(window.__resaTables||[]).filter(function(t){return (t.active!==false)&&((+t.seats)>=party);}).sort(function(a,b){return (+a.seats)-(+b.seats);});
   if((window.__resaTables||[]).length){
     if(!tables.length){res.style.color='var(--rouge)';res.textContent='Aucune table ne peut accueillir '+party+' pers. (vérifie ta configuration).';return;}
-    var tid=await findFreeTable(tables,startISO,endISO);
+    var keepTable=null;
+    if(prev&&prev.table_id){
+      // Garder la même table si elle convient toujours (taille + créneau libre hors cette réservation)
+      var cur=tables.filter(function(t){return String(t.id)===String(prev.table_id);})[0];
+      if(cur){
+        try{var occ=await sb.from('reservations').select('id').eq('table_id',cur.id).neq('status','cancelled').neq('id',editId).lt('date_time',endISO).gt('end_time',startISO).limit(1);
+          if(!occ.error&&(!occ.data||!occ.data.length))keepTable=cur.id;
+        }catch(e){}
+      }
+    }
+    var tid=keepTable||await findFreeTable(tables,startISO,endISO,editId);
     if(!tid){res.style.color='var(--rouge)';res.textContent='Complet à cette heure — aucune table de '+party+' pers. disponible.';return;}
     payload.table_id=tid;
   }
   try{
-    var r=await sb.from('reservations').insert(payload);
+    var r;
+    if(editId){delete payload.consent;r=await sb.from('reservations').update(payload).eq('id',editId);}
+    else r=await sb.from('reservations').insert(payload);
     if(r.error){var m=r.error.message||'';res.style.color='var(--rouge)';res.textContent=(m.indexOf('no_overlap')>=0)?"Ce créneau vient d'être pris. Choisis une autre heure.":('Erreur : '+m);return;}
     var wantMail=document.getElementById('nr_sendmail');
     if(email&&wantMail&&wantMail.checked){
       var brand=(document.getElementById('brandTitle')&&document.getElementById('brandTitle').textContent)||'Le restaurant';
       fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'notify',blogId:window.currentBlog,brandName:brand,name:name,email:email,dt:startISO,party:party,allergens:allerg})}).catch(function(){});
     }
-    res.style.color='var(--vert)';res.textContent='✓ Réservation enregistrée'+(payload.table_id?' · table assignée':'')+(email&&wantMail&&wantMail.checked?' · email envoyé':'')+' !';
+    res.style.color='var(--vert)';res.textContent=(editId?'✓ Réservation modifiée':'✓ Réservation enregistrée')+(payload.table_id?' · table assignée':'')+(email&&wantMail&&wantMail.checked?' · email envoyé':'')+' !';
+    window.__editResaId=null;
     setTimeout(function(){document.getElementById('newResaModal').style.display='none';},900);
     loadResa();
   }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}
@@ -2946,10 +3140,61 @@ window.saveSite=async function(){
 "audience max":["peak audience","audiencia máxima"],
 "très actif":["very active","muy activo"],
 "fort engagement":["strong engagement","fuerte interacción"],
-"Profil complet à 100% 🎉 Hospi te connaît par cœur.":["Profile 100% complete 🎉 Hospi knows you by heart.","Perfil completo al 100% 🎉 Hospi te conoce de memoria."]
+"Profil complet à 100% 🎉 Hospi te connaît par cœur.":["Profile 100% complete 🎉 Hospi knows you by heart.","Perfil completo al 100% 🎉 Hospi te conoce de memoria."],
+"Modifier le rendez-vous":["Edit appointment","Modificar la cita"],
+"Nouveau rendez-vous":["New appointment","Nueva cita"],
+"Profil complet à 100% 🎉 Hospi te connaît par cœur.":["Profile 100% complete 🎉 Hospi knows you by heart.","Perfil completo al 100% 🎉 Hospi te conoce de memoria."],
+"· Tes réseaux · 30 derniers jours":["· Your networks · last 30 days","· Tus redes · últimos 30 días"],
+"posts + Reels Instagram":["Instagram posts + Reels","posts + Reels de Instagram"],
+"non connecté":["not connected","no conectado"],
+"Créer du contenu":["Create content","Crear contenido"],
+"Ton texte":["Your text","Tu texto"],
+"Tes visuels":["Your visuals","Tus visuales"],
+"Tes réseaux":["Your networks","Tus redes"],
+"Programmation":["Scheduling","Programación"],
+"Laisse Hospi écrire pour toi":["Let Hospi write for you","Deja que Hospi escriba por ti"],
+"Décris ton contenu en 1-2 phrases : Hospi rédige la légende avec ta voix, ta ville et ton branding.":["Describe your content in 1-2 sentences: Hospi writes the caption with your voice, your city and your branding.","Describe tu contenido en 1-2 frases: Hospi redacta el pie con tu voz, tu ciudad y tu branding."],
+"Ex : photo de notre brunch du dimanche — pancakes, ambiance cosy. Envie de donner faim et d'inviter à réserver.":["E.g.: photo of our Sunday brunch — pancakes, cosy vibe. Want to make people hungry and invite them to book.","Ej.: foto de nuestro brunch del domingo — pancakes, ambiente cosy. Quiero abrir el apetito e invitar a reservar."],
+"✦ Hospi rédige la légende":["✦ Hospi writes the caption","✦ Hospi redacta el pie"],
+"Texte du post (publié tel quel)":["Post text (published as is)","Texto del post (se publica tal cual)"],
+"Écris ton post ici… ou utilise Hospi ci-dessus ✦":["Write your post here… or use Hospi above ✦","Escribe tu post aquí… o usa Hospi arriba ✦"],
+"Date et heure de publication":["Publication date and time","Fecha y hora de publicación"],
+"✓ Programmer":["✓ Schedule","✓ Programar"],
+"Hospi rédige à partir de ton contexte et de ton branding…":["Hospi is writing from your context and your branding…","Hospi está redactando con tu contexto y tu branding…"],
+"aperçu en direct":["live preview","vista previa en vivo"],
+"Compose ta story en quelques secondes : ton visuel, ton texte, ton style — et publie.":["Compose your story in seconds: your visual, your text, your style — and publish.","Crea tu story en segundos: tu visual, tu texto, tu estilo — y publica."],
+"Ton message":["Your message","Tu mensaje"],
+"Ton visuel":["Your visual","Tu visual"],
+"Ton style":["Your style","Tu estilo"],
+"Modifier la réservation":["Edit booking","Modificar la reserva"],
+"Enregistrer les modifications":["Save changes","Guardar los cambios"],
+"✏️ Modifier":["✏️ Edit","✏️ Modificar"],
+"Rapport de performance · données réelles":["Performance report · real data","Informe de rendimiento · datos reales"],
+"Vue complète des 30 derniers jours · réseaux sociaux & réputation":["Full view of the last 30 days · social media & reputation","Vista completa de los últimos 30 días · redes sociales y reputación"],
+"au total · Instagram":["in total · Instagram","en total · Instagram"],
+"variation nette":["net change","variación neta"],
+"cumul des portées quotidiennes":["sum of daily reach","suma del alcance diario"],
+"posts + Reels":["posts + Reels","posts + Reels"],
+"Détail du mois":["Month in detail","Detalle del mes"],
+"Contenus, réputation & plan d'action":["Content, reputation & action plan","Contenidos, reputación y plan de acción"],
+"Portée quotidienne · 30 jours":["Daily reach · 30 days","Alcance diario · 30 días"],
+"Top publications du mois":["Top posts of the month","Top publicaciones del mes"],
+"Réputation Google":["Google reputation","Reputación Google"],
+"Avis au total":["Total reviews","Reseñas en total"],
+".HOSPIRE PRO — rapport confidentiel":[".HOSPIRE PRO — confidential report",".HOSPIRE PRO — informe confidencial"],
+"Évolution des abonnés · 30 jours":["Followers evolution · 30 days","Evolución de seguidores · 30 días"],
+"Recommandations pour le mois prochain":["Recommendations for next month","Recomendaciones para el próximo mes"],
+"Bilan mensuel":["Monthly report","Balance mensual"],
+"Aucune publication sur la période.":["No posts in this period.","Sin publicaciones en el período."],
+"(sans légende)":["(no caption)","(sin pie de foto)"],
+"Capitaliser sur les formats qui ont fonctionné ce mois-ci et garder le rythme de publication.":["Build on the formats that worked this month and keep the posting rhythm.","Aprovecha los formatos que funcionaron este mes y mantén el ritmo de publicación."],
+"Publier 2 Reels courts cette semaine pour relancer la portée.":["Post 2 short Reels this week to boost reach.","Publica 2 Reels cortos esta semana para relanzar el alcance."],
+"Répondre à 100 % des avis et messages sous 24 h pour renforcer la relation client.":["Reply to 100% of reviews and messages within 24h to strengthen customer relationships.","Responde al 100% de reseñas y mensajes en 24 h para reforzar la relación con el cliente."],
+"Publier aux créneaux à forte audience identifiés dans « Meilleurs moments pour publier ».":["Post at the high-audience slots identified in “Best times to post”.","Publica en las franjas de mayor audiencia identificadas en «Mejores momentos para publicar»."],
+"✓ Réservation modifiée":["✓ Booking updated","✓ Reserva modificada"]
   };
   var mo=null;
-  function skip(el){return !el||el.closest&&(el.closest('script,style,svg,#report,[data-i18n-skip],option,optgroup,.pill-opt,[data-group],[data-val]'));}
+  function skip(el){return !el||el.closest&&(el.closest('script,style,svg,[data-i18n-skip],option,optgroup,.pill-opt,[data-group],[data-val]'));}
   function has(v){if(!v)return false;var s=v.trim();return !!s&&/[A-Za-zÀ-ÿ]/.test(s);}
   var DAYS={"Lundi":["Monday","Lunes"],"Mardi":["Tuesday","Martes"],"Mercredi":["Wednesday","Miércoles"],"Jeudi":["Thursday","Jueves"],"Vendredi":["Friday","Viernes"],"Samedi":["Saturday","Sábado"],"Dimanche":["Sunday","Domingo"]};
   var R=[
@@ -2964,7 +3209,19 @@ window.saveSite=async function(){
     [/^Répondre à (\d+) messages? en attente$/,"Reply to $1 pending messages","Responder a $1 mensajes pendientes"],
     [/^Publier plus souvent · (\d+) publications? sur 30 j \(vise 2–3\/sem\.\)$/,"Post more often · $1 posts in 30 days (aim for 2–3/week)","Publica más a menudo · $1 publicaciones en 30 días (apunta a 2–3/sem.)"],
     [/^⏳ (\d+) demandes? de groupe à confirmer — clique dessus dans le calendrier$/,"⏳ $1 group requests to confirm — tap them in the calendar","⏳ $1 solicitudes de grupo por confirmar — tócalas en el calendario"],
-    [/^↳ sur ta publication : «(.+)»$/,"↳ on your post: «$1»","↳ en tu publicación: «$1»"]
+    [/^↳ sur ta publication : «(.+)»$/,"↳ on your post: «$1»","↳ en tu publicación: «$1»"],
+    [/^✓ Rendez-vous (?:modifié|enregistré) · email envoyé !$/,"✓ Appointment saved · email sent!","✓ ¡Cita guardada · email enviado!"],
+    [/^✓ Rendez-vous (?:modifié|enregistré) !$/,"✓ Appointment saved!","✓ ¡Cita guardada!"],
+[/^↳ sur ta publication : «(.+)»$/,"↳ on your post: «$1»","↳ en tu publicación: «$1»"],
+    [/^· 30j( · .+)?$/,"· 30d$1","· 30d$1"],
+    [/^Bilan mensuel — (.+)$/,"Monthly report — $1","Balance mensual — $1"],
+    [/^Bilan · (.+)$/,"Report · $1","Balance · $1"],
+    [/^\.HOSPIRE PRO · pro\.hospireclub\.com · Généré le (.+)$/,".HOSPIRE PRO · pro.hospireclub.com · Generated on $1",".HOSPIRE PRO · pro.hospireclub.com · Generado el $1"],
+    [/^Répondre aux (\d+) avis Google en attente sous 24 h pour renforcer la réputation\.$/,"Reply to the $1 pending Google reviews within 24h to strengthen your reputation.","Responde a las $1 reseñas de Google pendientes en 24 h para reforzar la reputación."],
+    [/^✓ Réservation (?:modifiée|enregistrée) · table assignée · email envoyé !$/,"✓ Booking saved · table assigned · email sent!","✓ ¡Reserva guardada · mesa asignada · email enviado!"],
+    [/^✓ Réservation (?:modifiée|enregistrée) · table assignée !$/,"✓ Booking saved · table assigned!","✓ ¡Reserva guardada · mesa asignada!"],
+    [/^✓ Réservation (?:modifiée|enregistrée) · email envoyé !$/,"✓ Booking saved · email sent!","✓ ¡Reserva guardada · email enviado!"],
+    [/^✓ Réservation (?:modifiée|enregistrée) !$/,"✓ Booking saved!","✓ ¡Reserva guardada!"]
   ];
   function tr(src,l){var k=src.trim();var e=T[k];if(e){var t=(l==='en')?e[0]:e[1];return t?src.replace(k,t):src;}
     var dm=k.match(/^🗓️ (Lundi|Mardi|Mercredi|Jeudi|Vendredi|Samedi|Dimanche) (\d+)h$/);if(dm){var dd=DAYS[dm[1]];if(dd)return src.replace(k,'🗓️ '+dd[l==='en'?0:1]+' '+dm[2]+'h');}
@@ -2991,21 +3248,48 @@ window.saveSite=async function(){
 })();
 </script>
 <div id="report">
-  <div class="r-head">
-    <div class="r-brand"><span class="dot">.</span>HOSPIRE <em>PRO</em></div>
-    <div class="r-meta" id="repMeta"></div>
+  <div class="r-pg1">
+    <div class="r-head">
+      <div class="r-brand"><span class="dot">.</span>HOSPIRE <em>PRO</em></div>
+      <div class="r-meta" id="repMeta"></div>
+    </div>
+    <div class="r-hero"><div class="r-eyebrow">Rapport de performance · données réelles</div><h1 id="repH1">Bilan mensuel</h1><p>Vue complète des 30 derniers jours · réseaux sociaux &amp; réputation</p></div>
+    <div class="r-gline"></div>
+    <div class="r-kpis">
+      <div class="r-kpi"><div class="k-l">Abonnés</div><div class="k-n" id="rk4">—</div><div class="k-d">au total · Instagram</div></div>
+      <div class="r-kpi"><div class="k-l">Nouveaux abonnés · 30j</div><div class="k-n" id="rk1">—</div><div class="k-d">variation nette</div></div>
+      <div class="r-kpi"><div class="k-l">Portée · 30j</div><div class="k-n" id="rk2">—</div><div class="k-d">cumul des portées quotidiennes</div></div>
+      <div class="r-kpi"><div class="k-l">Publications · 30j</div><div class="k-n" id="rk3">—</div><div class="k-d">posts + Reels</div></div>
+    </div>
+    <div class="r-kpis">
+      <div class="r-kpi"><div class="k-l">Interactions · 30j</div><div class="k-n" id="rk5">—</div><div class="k-d">j'aime · comm. · enreg. · partages</div></div>
+      <div class="r-kpi"><div class="k-l">Taux d'engagement</div><div class="k-n" id="rk6">—</div><div class="k-d">interactions / portée</div></div>
+      <div class="r-kpi"><div class="k-l">Enregistrements · 30j</div><div class="k-n" id="rk7">—</div><div class="k-d">« je garde ça »</div></div>
+      <div class="r-kpi"><div class="k-l">Partages · 30j</div><div class="k-n" id="rk8">—</div><div class="k-d">envois en DM / story</div></div>
+    </div>
+    <div class="r-sec"><h3>Évolution des abonnés · 30 jours</h3><div class="r-chart"><canvas id="repChart"></canvas></div></div>
+    <div class="r-sec"><h3>Le mot d'Hospi</h3><p class="r-word" id="repWord"></p></div>
+    <div class="r-foot"><span>.HOSPIRE PRO — rapport confidentiel</span><span>Page 1 / 2</span></div>
   </div>
-  <div class="r-hero"><h1 id="repH1">Bilan mensuel</h1><p>Résumé de performance · 30 derniers jours · données réelles</p></div>
-  <div class="r-kpis">
-    <div class="r-kpi"><div class="k-l">Nouveaux abonnés · 30j</div><div class="k-n" id="rk1">—</div><div class="k-d">Instagram</div></div>
-    <div class="r-kpi"><div class="k-l">Portée · 30j</div><div class="k-n" id="rk2">—</div><div class="k-d">impressions</div></div>
-    <div class="r-kpi"><div class="k-l">Publications · 30j</div><div class="k-n" id="rk3">—</div><div class="k-d">contenus publiés</div></div>
-    <div class="r-kpi"><div class="k-l">Abonnés</div><div class="k-n" id="rk4">—</div><div class="k-d">au total</div></div>
+  <div class="r-pg2">
+    <div class="r-head r-pghead">
+      <div class="r-brand"><span class="dot">.</span>HOSPIRE <em>PRO</em></div>
+      <div class="r-meta" id="repMeta2"></div>
+    </div>
+    <div class="r-hero" style="margin-top:18px"><div class="r-eyebrow">Détail du mois</div><h1 style="font-size:24px">Contenus, réputation &amp; plan d'action</h1></div>
+    <div class="r-gline"></div>
+    <div class="r-sec"><h3>Portée quotidienne · 30 jours</h3><div class="r-chart" style="height:170px"><canvas id="repChart2"></canvas></div></div>
+    <div class="r-sec"><h3>Top publications du mois</h3><div id="repTop"></div></div>
+    <div class="r-sec"><h3>Réputation Google</h3>
+      <div class="r-rep">
+        <div class="rp"><small>Note moyenne</small><b id="rp_avg">—</b></div>
+        <div class="rp"><small>Avis au total</small><b id="rp_count">—</b></div>
+        <div class="rp"><small>À répondre</small><b id="rp_pending">—</b></div>
+      </div>
+    </div>
+    <div class="r-sec"><h3>Recommandations pour le mois prochain</h3><ol class="r-recos" id="repRecos"></ol></div>
+    <div class="r-foot"><span id="repFoot"></span><span>Page 2 / 2</span></div>
   </div>
-  <div class="r-sec"><h3>Évolution des abonnés · 30 jours</h3><div class="r-chart"><canvas id="repChart"></canvas></div></div>
-  <div class="r-sec"><h3>Le mot d'Hospi</h3><p class="r-word" id="repWord"></p></div>
-  <div class="r-sec"><h3>Recommandations pour le mois prochain</h3><ol class="r-recos" id="repRecos"></ol></div>
-  <div class="r-foot" id="repFoot"></div>
 </div>
 </body>
 </html>
