@@ -788,6 +788,27 @@
     <div class="card" style="margin-top:18px"><h3>Top publications · 30j</h3>
       <div id="b_topposts"><div style="color:var(--muted);font-size:14px">Chargement…</div></div>
     </div>
+    <div class="card hoverable" style="margin-top:18px"><h3>Réputation Google · vue du mois</h3>
+      <div class="band" style="box-shadow:none;border:1px solid var(--line)">
+        <div class="cell"><div class="lbl">Note moyenne</div><div class="num" id="bx_avg">—</div><div class="delta">sur Google</div></div>
+        <div class="cell"><div class="lbl">Taux de réponse</div><div class="num" id="bx_resp">—</div><div class="delta">avis répondus</div></div>
+        <div class="cell"><div class="lbl">Avis positifs</div><div class="num" id="bx_pos" style="color:var(--vert,#2E9E6B)">—</div><div class="delta">4–5 étoiles</div></div>
+        <div class="cell"><div class="lbl">À surveiller</div><div class="num" id="bx_neg" style="color:var(--rouge,#C9564F)">—</div><div class="delta">1–2 étoiles</div></div>
+      </div>
+      <p id="bx_avisnote" style="font-size:13px;color:var(--muted);margin:12px 2px 0"></p>
+    </div>
+    <div class="card hoverable" style="margin-top:18px"><h3>Tes autres réseaux · 30 jours</h3>
+      <div id="bx_nets" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px"><div style="color:var(--muted);font-size:13.5px">Chargement…</div></div>
+    </div>
+    <div class="card hoverable" style="margin-top:18px"><h3 id="bx_resatitle">Réservations · 30 derniers jours</h3>
+      <div class="band" style="box-shadow:none;border:1px solid var(--line)">
+        <div class="cell"><div class="lbl" id="bx_rtot_l">Réservations</div><div class="num" id="bx_rtot">—</div><div class="delta">sur 30 jours</div></div>
+        <div class="cell" id="bx_rcov_cell"><div class="lbl">Couverts servis</div><div class="num" id="bx_rcov">—</div><div class="delta">clients accueillis</div></div>
+        <div class="cell"><div class="lbl">No-show</div><div class="num" id="bx_rns" style="color:var(--rouge,#C9564F)">—</div><div class="delta" id="bx_rns_d">taux : —</div></div>
+        <div class="cell"><div class="lbl">Via le site</div><div class="num" id="bx_rsite">—</div><div class="delta">sans commission</div></div>
+      </div>
+      <p id="bx_rbest" style="font-size:13px;color:var(--muted);margin:12px 2px 0"></p>
+    </div>
     <div class="card hoverable" style="margin-top:18px"><h3>Le mot d'Hospi</h3><p id="b_hospi" style="font-size:15px;line-height:1.7">Hospi prépare ton bilan du mois…</p></div>
   </section>
 
@@ -1025,6 +1046,7 @@ document.getElementById('menu').addEventListener('click',e=>{const a=e.target.cl
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));$(a.dataset.sec).classList.add('on');scrollTo({top:0,behavior:'smooth'});
   if(a.dataset.sec==='contenu'&&window.loadPlanning)window.loadPlanning();
   if(a.dataset.sec==='branding'&&window.loadProfile)window.loadProfile();
+  if(a.dataset.sec==='bilan'&&window.loadBilanExtra)window.loadBilanExtra();
   if(a.dataset.sec==='clients'&&window.loadClientsAdmin)window.loadClientsAdmin();});
 document.querySelectorAll('.subnav').forEach(function(sn){ sn.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
   sn.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
@@ -1255,7 +1277,8 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
     if(window.loadSite)window.loadSite();
     if(window.loadReviews)window.loadReviews();
     if(window.loadMessages)window.loadMessages();
-    if(window.loadGoogleInfo)window.loadGoogleInfo();}
+    if(window.loadGoogleInfo)window.loadGoogleInfo();
+    setTimeout(function(){if(window.loadBilanExtra)window.loadBilanExtra();},2600);}
   function _num(p,n){return (p&&p[n]!=null&&!isNaN(+p[n]))?+p[n]:0;}
   function _ptype(t){t=String(t||'').toUpperCase();if(t.indexOf('REEL')>=0||t.indexOf('VIDEO')>=0)return 'Reel';if(t.indexOf('CAROUSEL')>=0||t.indexOf('ALBUM')>=0)return 'Carrousel';return 'Photo';}
   function renderBilanStats(arr){
@@ -1339,8 +1362,11 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
       }catch(e){}
     }
     paintNet('d_ttnet',tt,ttExtra);
-    paintNet('d_fbnet',await netFollowers(bid,'facebook','followers'));
-    paintNet('d_linet',await netFollowers(bid,'linkedin','followers'));
+    var fb=await netFollowers(bid,'facebook','followers');
+    var li=await netFollowers(bid,'linkedin','followers');
+    paintNet('d_fbnet',fb);
+    paintNet('d_linet',li);
+    window.__nets={ig:ig,tt:tt,fb:fb,li:li};
   }
   async function loadBestTimes(bid){
     var box=$('d_besttimes');if(!box)return;
@@ -1388,12 +1414,8 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
     var base='Sur 30 jours : '+(g>=0?'+':'')+g+' abonnés, '+fmt(reach)+' de portée et '+posts+' publication'+(posts>1?'s':'')+'. ';
     base+=(g>0?'Belle dynamique — on garde le cap et on capitalise sur ce qui marche. 💪':'On relance avec 2 Reels cette semaine pour faire remonter la portée. 💪');
     el.textContent=base;
-    try{
-      var name=($('brandTitle')&&$('brandTitle').textContent)||'';
-      var msg='Rédige un bilan mensuel court et chaleureux (3-4 phrases) à partir de ces chiffres RÉELS sur 30 jours : abonnés actuels '+foll+', variation '+g+' abonnés, portée '+reach+', '+posts+' publications. Termine par UNE recommandation concrète pour le mois prochain. N\'invente aucun chiffre. IMPORTANT : texte brut uniquement, SANS markdown, sans astérisques (*), sans dièses (#), sans titres.';
-      var r=await fetch('/api/hospi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vertical:(document.body.classList.contains('beauty')?'beauty':'resto'),mode:'chat',message:msg,profile:{name:name},lang:(window.__lang||"fr")})});
-      var j=await r.json();if(j&&j.text&&!j.needsKey)el.textContent=j.text.replace(/[*#`_]+/g,'').replace(/[ \t]{2,}/g,' ').trim();
-    }catch(e){}}
+    /* Le mot d'Hospi complet (réseaux + avis + réservations) est généré par bilanHospi360. */
+  }
   async function startApp(forced){var j=await api('brands');var list=(j&&(j.data||j))||[];var sel=$('bsel');
     if(forced&&forced.id){cur=forced.id;var wrap=document.querySelector('.bsel');if(wrap)wrap.style.display='none';if(forced.label)$('brandTitle').textContent=forced.label;load();return;}
     if(sel&&list.length){sel.innerHTML='';list.forEach(function(b){var o=document.createElement('option');o.value=b.id||b.blogId;o.textContent=b.label;sel.appendChild(o);});
@@ -1454,6 +1476,10 @@ function chartAccent(){var b=document.body.classList.contains('beauty');return b
 /* Vocabulaire Beauté (FR) : remplace les termes resto par des termes beauté.
    Ciblé (nœud entier exact + phrases uniques) pour ne pas casser l'i18n EN/ES. */
 var BEAUTY_EXACT={
+  "Réservations · 30 derniers jours":"Rendez-vous · 30 derniers jours",
+  "Réservations du mois":"Rendez-vous du mois",
+  "Couverts servis":"Rendez-vous honorés",
+  "clients accueillis":"clientes accueillies",
   "Mon site":"Mon studio",
   "Carte & horaires":"Prestations & horaires",
   "Ma carte":"Mes prestations",
@@ -1899,6 +1925,111 @@ window.delPost=async function(id){if(!id)return;if(!confirm('Supprimer ce post ?
 /* PWA : service worker (app installable) */
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
 /* ---- Rapport PDF mensuel ---- */
+/* ---- Bilan 360 : réputation + autres réseaux + réservations (données réelles, rien d'inventé) ---- */
+function _isBeautyMode(){return document.body.classList.contains('beauty');}
+window.loadBilanExtra=async function(){
+  var $=function(id){return document.getElementById(id);};
+  var fmtX=function(n){if(n==null||isNaN(n))return '—';n=Math.round(n);return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'K':''+n;};
+  /* --- Réservations 30 jours (Supabase) --- */
+  var R=null;
+  if(typeof sb!=='undefined'&&sb&&window.currentBlog){
+    try{
+      var from=new Date(Date.now()-30*864e5).toISOString();
+      var q=await sb.from('reservations').select('*').eq('blog_id',window.currentBlog).gte('date_time',from).lte('date_time',new Date().toISOString());
+      var rows=(q&&q.data)||[];
+      R={tot:0,cov:0,arr:0,ns:0,can:0,site:0,byDay:{},byH:{},bySvc:{}};
+      rows.forEach(function(x){
+        if(x.status==='cancelled'){R.can++;return;}
+        R.tot++;R.cov+=(+x.covers||0);
+        if(x.status==='arrived')R.arr++;
+        if(x.status==='no_show')R.ns++;
+        if((x.source||'').toLowerCase().indexOf('site')>=0)R.site++;
+        var d=new Date(x.date_time);var wd=(d.getDay()+6)%7;
+        R.byDay[wd]=(R.byDay[wd]||0)+1;R.byH[d.getHours()]=(R.byH[d.getHours()]||0)+1;
+        if(x.service)R.bySvc[x.service]=(R.bySvc[x.service]||0)+1;
+      });
+      var dn=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+      var bd=Object.keys(R.byDay).sort(function(a,b){return R.byDay[b]-R.byDay[a];})[0];
+      var bh=Object.keys(R.byH).sort(function(a,b){return R.byH[b]-R.byH[a];})[0];
+      R.bestDay=(bd!=null)?dn[+bd]:null;R.bestHour=(bh!=null)?(+bh):null;
+      R.nsRate=R.tot?(R.ns/R.tot*100):null;R.sitePct=R.tot?(R.site/R.tot*100):null;
+      R.topSvc=Object.keys(R.bySvc).sort(function(a,b){return R.bySvc[b]-R.bySvc[a];}).slice(0,3);
+      window.__bilanResa=R;
+    }catch(e){}
+  }
+  /* --- Avis Google (global + 30j) --- */
+  var rv=window.__reviews||[];
+  if(!rv.length){
+    try{var rr=await fetch('/api/hub?action=inboxReviews&blogId='+encodeURIComponent(window.currentBlog||''));var jj=await rr.json();rv=(jj&&jj.data)||[];}catch(e){}
+  }
+  var A=null;
+  if(rv.length){
+    var rated=rv.filter(function(x){return +x.stars;});
+    var avg=rated.length?(rated.reduce(function(a,x){return a+(+x.stars||0);},0)/rated.length):null;
+    var replied=rv.filter(function(x){return (typeof _revReplied==='function')?_revReplied(x):false;}).length;
+    var lim=Date.now()-30*864e5;
+    var last30=rv.filter(function(x){var t=Date.parse(x.creationDate||'');return t&&t>=lim;});
+    A={count:rv.length,avg:avg,respRate:rv.length?(replied/rv.length*100):null,
+       pos:rv.filter(function(x){return +x.stars>=4;}).length,neg:rv.filter(function(x){return +x.stars>0&&+x.stars<=2;}).length,
+       n30:last30.length,pos30:last30.filter(function(x){return +x.stars>=4;}).length,neg30:last30.filter(function(x){return +x.stars>0&&+x.stars<=2;}).length,
+       pending:rv.filter(function(x){return (typeof _revReplied==='function')?!_revReplied(x):false;}).length};
+    window.__bilanAvis=A;
+  }
+  /* --- Rendu écran --- */
+  if(A){
+    if($('bx_avg'))$('bx_avg').textContent=(A.avg!=null?A.avg.toFixed(1)+' ★':'—');
+    if($('bx_resp'))$('bx_resp').textContent=(A.respRate!=null?Math.round(A.respRate)+'%':'—');
+    if($('bx_pos'))$('bx_pos').textContent=A.pos;
+    if($('bx_neg'))$('bx_neg').textContent=A.neg;
+    if($('bx_avisnote')){
+      var s1=A.n30?('<span>📈 '+A.n30+' '+(A.n30>1?'nouveaux avis':'nouvel avis')+' sur 30 jours</span> (<span>'+A.pos30+' positif'+(A.pos30>1?'s':'')+'</span>'+(A.neg30?(' · <span>'+A.neg30+' négatif'+(A.neg30>1?'s':'')+'</span>'):'')+').'):'<span>Aucun nouvel avis sur les 30 derniers jours.</span>';
+      var s2=A.pending?('<span>⏳ '+A.pending+' avis attendent encore une réponse.</span>'):'<span>✓ Tous les avis ont reçu une réponse.</span>';
+      $('bx_avisnote').innerHTML=s1+' '+s2;
+    }
+  }
+  var nets=$('bx_nets');
+  if(nets){
+    var cards=[];
+    function netCard(name,d,extra){
+      if(!d)return '<div style="border:1px solid var(--line);border-radius:14px;padding:14px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600">'+name+'</div><div style="font-size:13px;color:var(--muted);margin-top:6px">non connecté</div></div>';
+      return '<div style="border:1px solid var(--line);border-radius:14px;padding:14px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600">'+name+'</div>'+
+        '<div class="disp" style="font-size:26px;font-weight:600;margin-top:6px">'+fmtX(d.foll!=null?d.foll:d.followers)+'</div>'+
+        '<div style="font-size:12.5px;color:var(--muted)">abonnés · <span style="color:'+(((d.growth||0)>=0)?'var(--vert,#2E9E6B)':'var(--rouge,#C9564F)')+';font-weight:700">'+((d.growth||0)>=0?'+':'')+(d.growth||0)+'</span> sur 30j'+(extra?(' · '+extra):'')+'</div></div>';
+    }
+    var N=window.__nets||{};
+    cards.push(netCard('TikTok',window.__tt||N.tt,(window.__tt&&window.__tt.likes)?(fmtX(window.__tt.likes)+" j'aime"):''));
+    cards.push(netCard('Facebook',N.fb));
+    cards.push(netCard('LinkedIn',N.li));
+    nets.innerHTML=cards.join('');
+  }
+  if(R){
+    var beauty=_isBeautyMode();
+    if($('bx_rtot'))$('bx_rtot').textContent=R.tot;
+    if($('bx_rcov'))$('bx_rcov').textContent=beauty?(R.topSvc.length?R.topSvc.length:'—'):fmtX(R.cov);
+    if(beauty&&$('bx_rcov_cell'))$('bx_rcov_cell').innerHTML='<div class="lbl">Top prestations</div><div style="font-size:13.5px;line-height:1.6;margin-top:8px">'+(R.topSvc.length?R.topSvc.map(function(s){return '💅 '+_esc(s);}).join('<br>'):'—')+'</div>';
+    if($('bx_rns'))$('bx_rns').textContent=R.ns;
+    if($('bx_rns_d'))$('bx_rns_d').textContent='taux : '+(R.nsRate!=null?R.nsRate.toFixed(0)+'%':'—');
+    if($('bx_rsite'))$('bx_rsite').textContent=(R.sitePct!=null?Math.round(R.sitePct)+'%':'—');
+    if($('bx_rbest'))$('bx_rbest').innerHTML=(R.tot?('<span>🔥 Jour le plus demandé :</span> <b>'+(R.bestDay||'—')+'</b>'+(R.bestHour!=null?(' · <span>heure forte :</span> <b>'+R.bestHour+'h</b>'):'')+'.'):'<span>Aucune réservation enregistrée sur la période.</span>');
+  }
+  bilanHospi360(A,R);
+};
+/* Le mot d'Hospi : synthèse de TOUT le mois (réseaux + avis + réservations), uniquement avec les chiffres réels */
+async function bilanHospi360(A,R){
+  var el=document.getElementById('b_hospi');if(!el)return;
+  var rep=window.__rep||{},acc=window.__acc||{};
+  var g=(rep.growth==null?0:rep.growth);
+  var parts=['Instagram : '+(rep.foll!=null?rep.foll:'?')+' abonnés (variation '+(g>=0?'+':'')+g+'), portée cumulée '+(acc.reach||rep.reach||0)+', '+(rep.posts||0)+' publications (posts + Reels).'];
+  if(window.__tt&&window.__tt.followers!=null)parts.push('TikTok : '+window.__tt.followers+' abonnés ('+((window.__tt.growth||0)>=0?'+':'')+(window.__tt.growth||0)+' sur 30j)'+((window.__tt.likes)?(', '+window.__tt.likes+" j'aime sur 30j"):'')+'.');
+  if(A)parts.push('Avis Google : note moyenne '+(A.avg!=null?A.avg.toFixed(1):'?')+'/5, '+A.count+' avis au total ('+A.pos+' positifs, '+A.neg+' négatifs), taux de réponse '+(A.respRate!=null?Math.round(A.respRate):'?')+'%, '+A.n30+' nouveaux avis sur 30 jours'+(A.pending?(', '+A.pending+' en attente de réponse'):'')+'.');
+  if(R&&R.tot)parts.push((_isBeautyMode()?'Rendez-vous':'Réservations')+' sur 30 jours : '+R.tot+(_isBeautyMode()?'':' ('+R.cov+' couverts)')+', '+R.ns+' no-show ('+(R.nsRate!=null?R.nsRate.toFixed(0):'0')+'%), '+(R.sitePct!=null?Math.round(R.sitePct):0)+'% via le site'+(R.bestDay?(', jour le plus fort : '+R.bestDay):'')+'.');
+  try{
+    var name=(document.getElementById('brandTitle')&&document.getElementById('brandTitle').textContent)||'';
+    var msg='Rédige le bilan mensuel de l\'établissement (5-6 phrases, chaleureux et professionnel) à partir de ces données RÉELLES du mois :\n- '+parts.join('\n- ')+'\nMets en avant 1 victoire et 1 point d\'attention, puis termine par UNE recommandation concrète pour le mois prochain. N\'invente aucun chiffre. IMPORTANT : texte brut uniquement, SANS markdown, sans astérisques (*), sans dièses (#), sans titres.';
+    var r=await fetch('/api/hospi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vertical:(document.body.classList.contains('beauty')?'beauty':'resto'),mode:'chat',message:msg,profile:window.__brandProfile||{name:name},lang:(window.__lang||"fr")})});
+    var j=await r.json();if(j&&j.text&&!j.needsKey)el.textContent=j.text.replace(/[*#`_]+/g,'').replace(/[ \t]{2,}/g,' ').trim();
+  }catch(e){}
+}
 window.downloadReport=function(){
   var $=function(id){return document.getElementById(id);};
   var r=window.__rep||{},acc=window.__acc||{};
@@ -1927,7 +2058,7 @@ window.downloadReport=function(){
   /* Top publications (page 2) */
   var top=$('repTop');
   if(top){
-    var sorted=arr.slice().sort(function(a,b){var ia=num(a,'interactions')||(num(a,'likes')+num(a,'comments')+num(a,'saved')+num(a,'shares'));var ib=num(b,'interactions')||(num(b,'likes')+num(b,'comments')+num(b,'saved')+num(b,'shares'));return ib-ia;}).slice(0,5);
+    var sorted=arr.slice().sort(function(a,b){var ia=num(a,'interactions')||(num(a,'likes')+num(a,'comments')+num(a,'saved')+num(a,'shares'));var ib=num(b,'interactions')||(num(b,'likes')+num(b,'comments')+num(b,'saved')+num(b,'shares'));return ib-ia;}).slice(0,4);
     if(!sorted.length)top.innerHTML='<div style="font-size:12px;color:#8C857A">Aucune publication sur la période.</div>';
     else top.innerHTML=sorted.map(function(p,i){
       var it=num(p,'interactions')||(num(p,'likes')+num(p,'comments')+num(p,'saved')+num(p,'shares'));
@@ -1937,18 +2068,54 @@ window.downloadReport=function(){
       return '<div class="r-tp"><span class="tp-rank">'+(i+1)+'</span><div class="tp-main"><div class="tp-t">'+(txt||'(sans légende)')+'</div><div class="tp-m">'+ty+' · '+dd+' · ❤️ '+fmtN(num(p,'likes'))+' · 💬 '+fmtN(num(p,'comments'))+' · 🔖 '+fmtN(num(p,'saved'))+' · 👁 '+fmtN(num(p,'reach'))+'</div></div><div class="tp-n"><b>'+fmtN(it)+'</b><small>interactions</small></div></div>';
     }).join('');
   }
-  /* Réputation (page 2) */
-  var rv=window.__reviews||[];
-  var rated=rv.filter(function(x){return +x.stars;});
-  var avg=rated.length?(rated.reduce(function(a,x){return a+(+x.stars||0);},0)/rated.length):null;
-  var pend=rv.filter(function(x){return (x.status||'').toUpperCase()==='PENDING';}).length;
-  if($('rp_avg'))$('rp_avg').textContent=(avg!=null?avg.toFixed(1)+' ★':'—');
-  if($('rp_count'))$('rp_count').textContent=(rv.length||'—');
-  if($('rp_pending'))$('rp_pending').textContent=(rv.length?pend:'—');
+  /* Réputation (page 2) — mêmes chiffres que l'écran Bilan */
+  var A=window.__bilanAvis||null;
+  if(!A){
+    var rv=window.__reviews||[];
+    var rated=rv.filter(function(x){return +x.stars;});
+    A=rv.length?{count:rv.length,avg:rated.length?(rated.reduce(function(a,x){return a+(+x.stars||0);},0)/rated.length):null,
+      respRate:null,pos:rv.filter(function(x){return +x.stars>=4;}).length,neg:rv.filter(function(x){return +x.stars>0&&+x.stars<=2;}).length,
+      n30:0,pos30:0,neg30:0,pending:rv.filter(function(x){return (x.status||'').toUpperCase()==='PENDING';}).length}:null;
+  }
+  var pend=A?A.pending:0;
+  if($('rp_avg'))$('rp_avg').textContent=(A&&A.avg!=null?A.avg.toFixed(1)+' ★':'—');
+  if($('rp_resp'))$('rp_resp').textContent=(A&&A.respRate!=null?Math.round(A.respRate)+'%':'—');
+  if($('rp_pos'))$('rp_pos').textContent=(A?A.pos:'—');
+  if($('rp_neg'))$('rp_neg').textContent=(A?A.neg:'—');
+  if($('rp_note'))$('rp_note').innerHTML=A?('<span>'+A.count+' avis au total</span> · '+(A.n30?('<span>'+A.n30+' nouveau'+(A.n30>1?'x':'')+' sur 30 jours</span> (<span>'+A.pos30+' positif'+(A.pos30>1?'s':'')+'</span>'+(A.neg30?(' · <span>'+A.neg30+' négatif'+(A.neg30>1?'s':'')+'</span>'):'')+')'):'<span>aucun nouveau sur 30 jours</span>')+(pend?(' · <span>'+pend+' en attente de réponse</span>'):' · <span>tous répondus</span>')):'';
+  /* Autres réseaux (page 2) */
+  var N=window.__nets||{};
+  function pnet(idb,idd,d,extra){
+    if($(idb))$(idb).textContent=d?fmtN(d.foll):'—';
+    if($(idd))$(idd).innerHTML=d?('<span>abonnés</span> · '+((d.growth||0)>=0?'+':'')+(d.growth||0)+' <span>/ 30j</span>'+(extra?(' · '+extra):'')):'<span>non connecté</span>';
+  }
+  pnet('rp_tt','rp_tt_d',(window.__tt&&window.__tt.followers!=null)?{foll:window.__tt.followers,growth:window.__tt.growth}:N.tt,(window.__tt&&window.__tt.likes)?(fmtN(window.__tt.likes)+" j'aime"):'');
+  pnet('rp_fb','rp_fb_d',N.fb,'');
+  pnet('rp_li','rp_li_d',N.li,'');
+  /* Réservations (page 2) */
+  var RB=window.__bilanResa||null;
+  var beauty2=(typeof _isBeautyMode==='function')&&_isBeautyMode();
+  if(RB){
+    if($('rp_rtot'))$('rp_rtot').textContent=RB.tot;
+    if(beauty2){
+      if($('rp_rcov_l'))$('rp_rcov_l').textContent='Top prestation';
+      if($('rp_rcov'))$('rp_rcov').textContent=(RB.topSvc&&RB.topSvc[0])?RB.topSvc[0]:'—';
+      if($('rp_rcov'))$('rp_rcov').style.fontSize='14px';
+      if($('rp_rtot_l'))$('rp_rtot_l').textContent='Rendez-vous';
+      if($('rp_resatitle'))$('rp_resatitle').textContent='Rendez-vous du mois';
+    }else{
+      if($('rp_rcov'))$('rp_rcov').textContent=fmtN(RB.cov);
+    }
+    if($('rp_rns'))$('rp_rns').textContent=RB.ns;
+    if($('rp_rns_d'))$('rp_rns_d').textContent='taux '+(RB.nsRate!=null?RB.nsRate.toFixed(0)+'%':'—');
+    if($('rp_rsite'))$('rp_rsite').textContent=(RB.sitePct!=null?Math.round(RB.sitePct)+'%':'—');
+    if($('rp_rbest'))$('rp_rbest').innerHTML=RB.tot?('<span>Jour le plus demandé :</span> <b>'+(RB.bestDay||'—')+'</b>'+(RB.bestHour!=null?(' · <span>heure forte :</span> <b>'+RB.bestHour+'h</b>'):'')):'<span>Aucune réservation enregistrée sur la période.</span>';
+  }
   var recos=[];
   recos.push(g>0?'Capitaliser sur les formats qui ont fonctionné ce mois-ci et garder le rythme de publication.':'Publier 2 Reels courts cette semaine pour relancer la portée.');
   recos.push(pend>0?('Répondre aux '+pend+' avis Google en attente sous 24 h pour renforcer la réputation.'):'Répondre à 100 % des avis et messages sous 24 h pour renforcer la relation client.');
-  recos.push('Publier aux créneaux à forte audience identifiés dans « Meilleurs moments pour publier ».');
+  if(RB&&RB.nsRate!=null&&RB.nsRate>=10)recos.push('Réduire les no-show ('+RB.nsRate.toFixed(0)+'%) : rappel automatique la veille et confirmation par email systématique.');
+  else recos.push('Publier aux créneaux à forte audience identifiés dans « Meilleurs moments pour publier ».');
   $('repRecos').innerHTML=recos.map(function(x){return '<li>'+x+'</li>';}).join('');
   $('repFoot').textContent='.HOSPIRE PRO · pro.hospireclub.com · Généré le '+new Date().toLocaleDateString((window.__loc||'fr-FR'));
   try{
@@ -1962,7 +2129,7 @@ window.downloadReport=function(){
     var c2=$('repChart2');var s2=(window.__accSeries&&window.__accSeries.reach)||[];
     if(window.__repChart2)window.__repChart2.destroy();
     if(c2&&s2.length){
-      c2.width=680;c2.height=160;
+      c2.width=680;c2.height=130;
       window.__repChart2=new Chart(c2,{type:'bar',data:{labels:s2.map(function(p){return lab(p.x);}),datasets:[{data:s2.map(function(p){return p.y;}),backgroundColor:'rgba(196,162,101,.55)',borderColor:'#C4A265',borderWidth:1,borderRadius:3}]},options:{responsive:false,animation:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:10}}}}});
     }
   }catch(e){}
@@ -3200,7 +3367,34 @@ window.saveSite=async function(){
 "Publier 2 Reels courts cette semaine pour relancer la portée.":["Post 2 short Reels this week to boost reach.","Publica 2 Reels cortos esta semana para relanzar el alcance."],
 "Répondre à 100 % des avis et messages sous 24 h pour renforcer la relation client.":["Reply to 100% of reviews and messages within 24h to strengthen customer relationships.","Responde al 100% de reseñas y mensajes en 24 h para reforzar la relación con el cliente."],
 "Publier aux créneaux à forte audience identifiés dans « Meilleurs moments pour publier ».":["Post at the high-audience slots identified in “Best times to post”.","Publica en las franjas de mayor audiencia identificadas en «Mejores momentos para publicar»."],
-"✓ Réservation modifiée":["✓ Booking updated","✓ Reserva modificada"]
+"✓ Réservation modifiée":["✓ Booking updated","✓ Reserva modificada"],
+"Réputation Google · vue du mois":["Google reputation · month view","Reputación Google · vista del mes"],
+"Taux de réponse":["Response rate","Tasa de respuesta"],
+"avis répondus":["reviews answered","reseñas respondidas"],
+"Avis positifs":["Positive reviews","Reseñas positivas"],
+"4–5 étoiles":["4–5 stars","4–5 estrellas"],
+"À surveiller":["To watch","A vigilar"],
+"1–2 étoiles":["1–2 stars","1–2 estrellas"],
+"Tes autres réseaux · 30 jours":["Your other networks · 30 days","Tus otras redes · 30 días"],
+"Réservations · 30 derniers jours":["Bookings · last 30 days","Reservas · últimos 30 días"],
+"Couverts servis":["Covers served","Cubiertos servidos"],
+"clients accueillis":["guests welcomed","clientes atendidos"],
+"sur 30 jours":["over 30 days","en 30 días"],
+"Aucun nouvel avis sur les 30 derniers jours.":["No new reviews in the last 30 days.","Sin reseñas nuevas en los últimos 30 días."],
+"✓ Tous les avis ont reçu une réponse.":["✓ Every review has been answered.","✓ Todas las reseñas tienen respuesta."],
+"🔥 Jour le plus demandé :":["🔥 Busiest day:","🔥 Día más solicitado:"],
+"Jour le plus demandé :":["Busiest day:","Día más solicitado:"],
+"heure forte :":["peak time:","hora fuerte:"],
+"Aucune réservation enregistrée sur la période.":["No bookings recorded in this period.","Sin reservas registradas en el período."],
+"/ 30j":["/ 30d","/ 30d"],
+"Réservations du mois":["Bookings this month","Reservas del mes"],
+"Rendez-vous du mois":["Appointments this month","Citas del mes"],
+"Rendez-vous":["Appointments","Citas"],
+"Top prestation":["Top treatment","Top prestación"],
+"Top prestations":["Top treatments","Top prestaciones"],
+"aucun nouveau sur 30 jours":["none new in 30 days","ninguna nueva en 30 días"],
+"tous répondus":["all answered","todas respondidas"],
+"Lundi":["Monday","Lunes"],"Mardi":["Tuesday","Martes"],"Mercredi":["Wednesday","Miércoles"],"Jeudi":["Thursday","Jueves"],"Vendredi":["Friday","Viernes"],"Samedi":["Saturday","Sábado"],"Dimanche":["Sunday","Domingo"]
   };
   var mo=null;
   function skip(el){return !el||el.closest&&(el.closest('script,style,svg,[data-i18n-skip],option,optgroup,.pill-opt,[data-group],[data-val]'));}
@@ -3230,7 +3424,16 @@ window.saveSite=async function(){
     [/^✓ Réservation (?:modifiée|enregistrée) · table assignée · email envoyé !$/,"✓ Booking saved · table assigned · email sent!","✓ ¡Reserva guardada · mesa asignada · email enviado!"],
     [/^✓ Réservation (?:modifiée|enregistrée) · table assignée !$/,"✓ Booking saved · table assigned!","✓ ¡Reserva guardada · mesa asignada!"],
     [/^✓ Réservation (?:modifiée|enregistrée) · email envoyé !$/,"✓ Booking saved · email sent!","✓ ¡Reserva guardada · email enviado!"],
-    [/^✓ Réservation (?:modifiée|enregistrée) !$/,"✓ Booking saved!","✓ ¡Reserva guardada!"]
+    [/^✓ Réservation (?:modifiée|enregistrée) !$/,"✓ Booking saved!","✓ ¡Reserva guardada!"],
+    [/^📈 (\d+) (?:nouveaux|nouvel) avis sur 30 jours$/,"📈 $1 new reviews in 30 days","📈 $1 reseñas nuevas en 30 días"],
+    [/^(\d+) positifs?$/,"$1 positive","$1 positivas"],
+    [/^(\d+) négatifs?$/,"$1 negative","$1 negativas"],
+    [/^⏳ (\d+) avis attendent encore une réponse\.$/,"⏳ $1 reviews still await a reply.","⏳ $1 reseñas siguen esperando respuesta."],
+    [/^(\d+) avis au total$/,"$1 reviews in total","$1 reseñas en total"],
+    [/^(\d+) nouveaux? sur 30 jours$/,"$1 new in 30 days","$1 nuevas en 30 días"],
+    [/^(\d+) en attente de réponse$/,"$1 awaiting a reply","$1 pendientes de respuesta"],
+    [/^taux : (\d+\s?%|—)$/,"rate: $1","tasa: $1"],
+    [/^taux (\d+\s?%|—)$/,"rate $1","tasa $1"]
   ];
   function tr(src,l){var k=src.trim();var e=T[k];if(e){var t=(l==='en')?e[0]:e[1];return t?src.replace(k,t):src;}
     var dm=k.match(/^🗓️ (Lundi|Mardi|Mercredi|Jeudi|Vendredi|Samedi|Dimanche) (\d+)h$/);if(dm){var dd=DAYS[dm[1]];if(dd)return src.replace(k,'🗓️ '+dd[l==='en'?0:1]+' '+dm[2]+'h');}
@@ -3287,14 +3490,32 @@ window.saveSite=async function(){
     </div>
     <div class="r-hero" style="margin-top:18px"><div class="r-eyebrow">Détail du mois</div><h1 style="font-size:24px">Contenus, réputation &amp; plan d'action</h1></div>
     <div class="r-gline"></div>
-    <div class="r-sec"><h3>Portée quotidienne · 30 jours</h3><div class="r-chart" style="height:170px"><canvas id="repChart2"></canvas></div></div>
+    <div class="r-sec"><h3>Portée quotidienne · 30 jours</h3><div class="r-chart" style="height:140px"><canvas id="repChart2"></canvas></div></div>
     <div class="r-sec"><h3>Top publications du mois</h3><div id="repTop"></div></div>
     <div class="r-sec"><h3>Réputation Google</h3>
-      <div class="r-rep">
+      <div class="r-rep" style="grid-template-columns:repeat(4,1fr)">
         <div class="rp"><small>Note moyenne</small><b id="rp_avg">—</b></div>
-        <div class="rp"><small>Avis au total</small><b id="rp_count">—</b></div>
-        <div class="rp"><small>À répondre</small><b id="rp_pending">—</b></div>
+        <div class="rp"><small>Taux de réponse</small><b id="rp_resp">—</b></div>
+        <div class="rp"><small>Avis positifs</small><b id="rp_pos" style="color:#2E9E6B">—</b></div>
+        <div class="rp"><small>À surveiller</small><b id="rp_neg" style="color:#C9564F">—</b></div>
       </div>
+      <p id="rp_note" style="font-size:11px;color:#8C857A;margin:8px 2px 0"></p>
+    </div>
+    <div class="r-sec"><h3>Tes autres réseaux · 30 jours</h3>
+      <div class="r-rep">
+        <div class="rp"><small>TikTok</small><b id="rp_tt">—</b><small id="rp_tt_d" style="text-transform:none;letter-spacing:0"></small></div>
+        <div class="rp"><small>Facebook</small><b id="rp_fb">—</b><small id="rp_fb_d" style="text-transform:none;letter-spacing:0"></small></div>
+        <div class="rp"><small>LinkedIn</small><b id="rp_li">—</b><small id="rp_li_d" style="text-transform:none;letter-spacing:0"></small></div>
+      </div>
+    </div>
+    <div class="r-sec"><h3 id="rp_resatitle">Réservations du mois</h3>
+      <div class="r-rep" style="grid-template-columns:repeat(4,1fr)">
+        <div class="rp"><small id="rp_rtot_l">Réservations</small><b id="rp_rtot">—</b></div>
+        <div class="rp"><small id="rp_rcov_l">Couverts servis</small><b id="rp_rcov">—</b></div>
+        <div class="rp"><small>No-show</small><b id="rp_rns" style="color:#C9564F">—</b><small id="rp_rns_d" style="text-transform:none;letter-spacing:0"></small></div>
+        <div class="rp"><small>Via le site</small><b id="rp_rsite">—</b></div>
+      </div>
+      <p id="rp_rbest" style="font-size:11px;color:#8C857A;margin:8px 2px 0"></p>
     </div>
     <div class="r-sec"><h3>Recommandations pour le mois prochain</h3><ol class="r-recos" id="repRecos"></ol></div>
     <div class="r-foot"><span id="repFoot"></span><span>Page 2 / 2</span></div>
