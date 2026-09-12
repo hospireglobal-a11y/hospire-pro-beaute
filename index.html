@@ -492,21 +492,51 @@
   #report .r-rep .rp small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8C857A;font-weight:600}
   #report .r-gline{height:3px;background:linear-gradient(90deg,#C4A265,#E9D9B4,transparent);border-radius:3px;margin:2px 0 18px}
   @media print{
-    @page{size:A4;margin:11mm}
-    html,body{width:188mm!important;margin:0 auto!important;background:#fff!important}
+    @page{size:A4;margin:9mm}
+    html,body{width:auto!important;margin:0!important;padding:0!important;background:#fff!important}
+    body::before,body::after{display:none!important;content:none!important}
     *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body>*{display:none!important}
-    /* Le rapport s'ajuste à la zone imprimable A4, quel que soit l'appareil */
-    #report{display:block!important;position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:188mm!important;margin:0 auto!important;color:#1A1510;font-family:var(--sans);font-size:12px}
+    /* Rapport calibré : chaque bloc a une taille maîtrisée pour tenir sur exactement 2 pages A4 */
+    #report{display:block!important;position:static!important;left:auto!important;top:auto!important;width:100%!important;max-width:100%!important;margin:0!important;color:#1A1510;font-family:var(--sans);font-size:10.5px;overflow:visible}
     #report *{max-width:100%;box-sizing:border-box}
-    #report .r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:5mm;margin-bottom:8mm}
-    #report .r-kpi{padding:10px}
-    #report .r-kpi .k-n{font-size:21px}
-    #report .r-hero h1{font-size:25px}
-    #report .r-chart{height:58mm}
-    #report .r-sec{break-inside:avoid;page-break-inside:avoid}
     #report .r-pg1{page-break-after:always}
     #report .r-pghead{display:flex!important}
+    #report .r-head{padding:11px 16px;border-radius:10px}
+    #report .r-brand{font-size:17px}
+    #report .r-brand em{font-size:8px;padding:2px 6px;margin-left:6px}
+    #report .r-meta{font-size:9px;line-height:1.4}
+    #report .r-hero{margin:12px 2px 6px}
+    #report .r-eyebrow{font-size:7.5px;letter-spacing:.18em;margin-bottom:2px}
+    #report .r-hero h1{font-size:23px}
+    #report .r-pg2 .r-hero h1{font-size:17px}
+    #report .r-hero p{font-size:9.5px;margin:3px 0 0}
+    #report .r-gline{height:2px;margin:0 0 9px}
+    #report .r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin:0 0 3mm}
+    #report .r-kpi{padding:9px 11px;border-radius:9px}
+    #report .r-kpi .k-l{font-size:6.8px;letter-spacing:.1em}
+    #report .r-kpi .k-n{font-size:18px;margin-top:3px}
+    #report .r-kpi .k-d{font-size:7.5px;margin-top:1px}
+    #report .r-sec{margin:0 0 11px;break-inside:avoid;page-break-inside:avoid}
+    #report .r-sec h3{font-size:11.5px;margin:0 0 5px;padding-bottom:3px;border-bottom-width:1.5px}
+    #report .r-chart{height:54mm;padding:7px 9px;border-radius:9px}
+    #report .r-chart-sm{height:31mm!important}
+    #report .r-word{font-size:10px;line-height:1.6;padding:9px 12px;border-left-width:2px}
+    #report .r-tp{padding:4.5px 0;gap:9px}
+    #report .r-tp .tp-rank{width:16px;height:16px;font-size:9px;border-radius:5px}
+    #report .r-tp .tp-t{font-size:9.5px}
+    #report .r-tp .tp-m{font-size:7.5px;margin-top:1px}
+    #report .r-tp .tp-n b{font-size:12px}
+    #report .r-tp .tp-n small{font-size:6.5px}
+    #report .r-rep{gap:2.5mm}
+    #report .r-rep.rp4{grid-template-columns:repeat(4,1fr)!important}
+    #report .r-rep .rp{padding:6px 4px;border-radius:8px}
+    #report .r-rep .rp b{font-size:15px;margin-top:2px}
+    #report .r-rep .rp small{font-size:6.5px;letter-spacing:.06em}
+    #report .r-sec p{font-size:8px!important;margin:4px 2px 0!important;color:#8C857A!important}
+    #report .r-recos li{padding:4px 0 4px 24px;font-size:9px;line-height:1.4}
+    #report .r-recos li:before{width:15px;height:15px;font-size:8.5px;top:4px}
+    #report .r-foot{margin-top:7px;padding-top:5px;font-size:7.5px}
   }
 </style>
 </head>
@@ -3480,6 +3510,7 @@ window.saveSite=async function(){
       <div class="r-kpi"><div class="k-l">Partages · 30j</div><div class="k-n" id="rk8">—</div><div class="k-d">envois en DM / story</div></div>
     </div>
     <div class="r-sec"><h3>Évolution des abonnés · 30 jours</h3><div class="r-chart"><canvas id="repChart"></canvas></div></div>
+    <div class="r-sec"><h3>Portée quotidienne · 30 jours</h3><div class="r-chart r-chart-sm" style="height:140px"><canvas id="repChart2"></canvas></div></div>
     <div class="r-sec"><h3>Le mot d'Hospi</h3><p class="r-word" id="repWord"></p></div>
     <div class="r-foot"><span>.HOSPIRE PRO — rapport confidentiel</span><span>Page 1 / 2</span></div>
   </div>
@@ -3490,10 +3521,9 @@ window.saveSite=async function(){
     </div>
     <div class="r-hero" style="margin-top:18px"><div class="r-eyebrow">Détail du mois</div><h1 style="font-size:24px">Contenus, réputation &amp; plan d'action</h1></div>
     <div class="r-gline"></div>
-    <div class="r-sec"><h3>Portée quotidienne · 30 jours</h3><div class="r-chart" style="height:140px"><canvas id="repChart2"></canvas></div></div>
     <div class="r-sec"><h3>Top publications du mois</h3><div id="repTop"></div></div>
     <div class="r-sec"><h3>Réputation Google</h3>
-      <div class="r-rep" style="grid-template-columns:repeat(4,1fr)">
+      <div class="r-rep rp4" style="grid-template-columns:repeat(4,1fr)">
         <div class="rp"><small>Note moyenne</small><b id="rp_avg">—</b></div>
         <div class="rp"><small>Taux de réponse</small><b id="rp_resp">—</b></div>
         <div class="rp"><small>Avis positifs</small><b id="rp_pos" style="color:#2E9E6B">—</b></div>
@@ -3509,7 +3539,7 @@ window.saveSite=async function(){
       </div>
     </div>
     <div class="r-sec"><h3 id="rp_resatitle">Réservations du mois</h3>
-      <div class="r-rep" style="grid-template-columns:repeat(4,1fr)">
+      <div class="r-rep rp4" style="grid-template-columns:repeat(4,1fr)">
         <div class="rp"><small id="rp_rtot_l">Réservations</small><b id="rp_rtot">—</b></div>
         <div class="rp"><small id="rp_rcov_l">Couverts servis</small><b id="rp_rcov">—</b></div>
         <div class="rp"><small>No-show</small><b id="rp_rns" style="color:#C9564F">—</b><small id="rp_rns_d" style="text-transform:none;letter-spacing:0"></small></div>
