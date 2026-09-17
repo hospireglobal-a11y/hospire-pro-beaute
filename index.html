@@ -1245,6 +1245,7 @@ window.loadProfile=async function(){
   if(typeof sb==='undefined'||!sb||!window.currentBlog)return;
   try{
     var r=await sb.from('brand_profiles').select('data').eq('blog_id',String(window.currentBlog)).maybeSingle();
+    if(((r&&r.error)||!r||!r.data)&&!window.__profileRetried){window.__profileRetried=true;try{await sb.auth.refreshSession();}catch(e){}r=await sb.from('brand_profiles').select('data').eq('blog_id',String(window.currentBlog)).maybeSingle();}
     var d=(r&&r.data&&r.data.data)||{};window.__brandProfile=d;
     BP_FIELDS.forEach(function(k){var el=document.getElementById('bp_'+k);if(el)el.value=(d[k]!=null?d[k]:'');});
     if(window.applyBeautyBranding)applyBeautyBranding();
@@ -1989,7 +1990,7 @@ window.delPost=async function(id){if(!id)return;if(!confirm('Supprimer ce post ?
   try{await fetch('/api/hub?id='+encodeURIComponent(id)+'&blogId='+encodeURIComponent(window.currentBlog),{method:'DELETE'});}catch(e){}
   if(window.loadPlanning)loadPlanning();if(window.loadCalendar)loadCalendar();};
 /* session au chargement */
-(async function(){ if(!sb) return; try{ var s=await sb.auth.getSession(); if(s.data&&s.data.session){ enterApp(s.data.session.user); } }catch(e){} })();
+(async function(){ if(!sb) return; try{ var s=await sb.auth.getSession(); if(s.data&&s.data.session){ var user=s.data.session.user; try{ var rs=await sb.auth.refreshSession(); if(rs&&rs.data&&rs.data.user)user=rs.data.user; }catch(e){} enterApp(user); } }catch(e){} })();
 /* PWA : service worker (app installable) */
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
 /* ---- Rapport PDF mensuel ---- */
@@ -2218,7 +2219,9 @@ window.loadResa=async function(){
   if((!window.__resaTables||!window.__resaTables.length)&&typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}}
   var rows=[];
   if(typeof sb!=='undefined'&&sb&&window.currentBlog){
-    try{var r=await sb.from('reservations').select('*').eq('blog_id',window.currentBlog).gte('date_time',start.toISOString()).lt('date_time',end.toISOString()).order('date_time');rows=(r&&r.data)||[];}catch(e){}
+    try{var r=await sb.from('reservations').select('*').eq('blog_id',window.currentBlog).gte('date_time',start.toISOString()).lt('date_time',end.toISOString()).order('date_time');rows=(r&&r.data)||[];
+      if(((r&&r.error)||!rows.length)&&!window.__resaRetried){window.__resaRetried=true;try{await sb.auth.refreshSession();}catch(e){}var r2=await sb.from('reservations').select('*').eq('blog_id',window.currentBlog).gte('date_time',start.toISOString()).lt('date_time',end.toISOString()).order('date_time');rows=(r2&&r2.data)||rows;}
+    }catch(e){}
   }
   __resaCache=rows;
   renderResaGrid(start,rows);
