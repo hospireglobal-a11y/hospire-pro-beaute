@@ -88,8 +88,8 @@
   .hospiTop:hover{transform:translateY(-1px) scale(1.03)}
   .hospiTop img{width:100%;height:100%;object-fit:cover;object-position:center 12%;border-radius:100px;background:var(--gold-soft)}
 
-  .insight{display:flex;align-items:center;gap:14px;margin:26px 0 4px;padding:15px 20px;border-radius:18px;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);font-size:14.5px}
-  .insight .ha{width:36px;height:36px;border-radius:100px;overflow:hidden;flex-shrink:0;background:var(--gold-soft)}
+  .insight{display:flex;align-items:center;gap:11px;margin:18px 0 2px;padding:11px 15px;border-radius:15px;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);font-size:14px;line-height:1.35}
+  .insight .ha{width:30px;height:30px;border-radius:100px;overflow:hidden;flex-shrink:0;background:var(--gold-soft)}
   .insight .ha img{width:100%;height:100%;object-fit:cover;object-position:center 10%}
   .insight b{font-family:var(--disp);font-weight:600}
 
@@ -101,8 +101,9 @@
   @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(46,158,107,0)}}
   .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:32px 0 14px}
 
-  .subnav{display:inline-flex;gap:2px;background:rgba(234,228,217,.5);padding:4px;border-radius:100px;margin-bottom:22px;flex-wrap:wrap}
-  .subnav button{border:none;background:none;font:inherit;font-size:13px;font-weight:500;color:var(--muted);padding:8px 16px;border-radius:100px;cursor:pointer;transition:.25s var(--spring)}
+  .subnav{display:flex;flex-wrap:nowrap;gap:2px;background:rgba(234,228,217,.5);padding:4px;border-radius:100px;margin-bottom:22px;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .subnav::-webkit-scrollbar{display:none}
+  .subnav button{border:none;background:none;font:inherit;font-size:13px;font-weight:500;color:var(--muted);padding:8px 16px;border-radius:100px;cursor:pointer;transition:.25s var(--spring);white-space:nowrap;flex:0 0 auto}
   .subnav button.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(26,21,16,.1)}
   .subpage{display:none}.subpage.on{display:block;animation:rise .4s var(--spring) both}
 
@@ -118,7 +119,7 @@
   .cards3{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
   @media(max-width:900px){.cards3{grid-template-columns:1fr}}
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}@media(max-width:820px){.g2{grid-template-columns:1fr}}
-  .card{background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:24px;box-shadow:var(--shadow);transition:.3s var(--spring)}
+  .card{background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:24px;box-shadow:var(--shadow);transition:.3s var(--spring);min-width:0;max-width:100%}
   .card.hoverable:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
   .card h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:18px}
   .chartwrap{height:250px;position:relative}
@@ -389,8 +390,8 @@
   #resaModal,#newResaModal,#resaConfigModal{display:none;position:fixed;inset:0;z-index:59;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px}
   #resaModal .m,#newResaModal .m,#resaConfigModal .m{background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:28px;width:420px;max-width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg);animation:rise .4s var(--spring) both}
   #resaConfigModal .m{width:520px}
-  .cf-tr{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  .cf-tr input{flex:1}
+  .cf-tr{display:flex;gap:8px;align-items:center;margin-bottom:8px;max-width:100%}
+  .cf-tr input{flex:1;min-width:0}
   .cf-hr{display:flex;gap:10px;align-items:center;margin-bottom:7px}
   .cf-hr label{width:44px;font-size:12px;color:var(--muted);font-weight:600}
 
@@ -747,7 +748,7 @@
 
   <!-- SITE -->
   <section class="page" id="site">
-    <div class="shead"><div><div class="t">Mon site</div><div class="m"><span class="live">synchronisé</span> · carte, horaires & infos · réservations sans commission</div></div><button class="btn ghost" id="siteViewBtn" onclick="siteView()">Voir mon site ↗</button></div>
+    <div class="shead"><div><div class="t">Mon site</div><div class="m"><span class="live">synchronisé</span> Carte & horaires · réservations sans commission</div></div><button class="btn ghost" id="siteViewBtn" onclick="siteView()">Voir mon site ↗</button></div>
     <div class="subnav" data-group="site"><button class="on" data-sp="s_resa">Réservations</button><button data-sp="s_carte">Carte & horaires</button><button data-sp="s_widget">Widget</button></div>
     <div class="subpage on" id="s_resa">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
@@ -1331,7 +1332,7 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
     arr.sort(function(a,b){var da=(a.publishedAt&&a.publishedAt.dateTime)||'',db=(b.publishedAt&&b.publishedAt.dateTime)||'';return db<da?-1:1;});
     var reachVal=sumF(arr,['reach','impressions','views']);
     $('d_posts').textContent=fmt(arr.length);$('d_reach').textContent=fmt(reachVal);draw(s);
-    var tip=(g!=null&&g>0)?"belle progression cette semaine 👏":"on lance des Reels pour faire décoller ça ?";$('insightMsg').innerHTML="<b>Hospi —</b> "+tip;
+    var tip=(g!=null&&g>0)?"belle progression cette semaine&nbsp;👏":"on lance des Reels pour décoller&nbsp;?";$('insightMsg').innerHTML="<b>Hospi —</b> "+tip;
     window.__rep={foll:last,growth:g,posts:arr.length,reach:reachVal,series:s.slice()};
     fillBilan(last,g,arr.length,reachVal);
     renderBilanStats(arr);
@@ -1565,8 +1566,9 @@ var BEAUTY_EXACT={
   "Nom du client":"Nom de la cliente"
 };
 var BEAUTY_SUB=[
-  ["carte, horaires & infos","prestations, horaires & infos"],
+  ["Carte & horaires","Prestations & horaires"],
   ["réservations sans commission","rendez-vous sans commission"],
+  ["communauté de restaurateurs et d'hôteliers du monde","communauté de professionnel·les de la beauté et du bien-être"],
   ["Ta carte, tes horaires et tes infos éditées ici alimentent ton site","Tes prestations, tes horaires et tes infos éditées ici alimentent ton site"],
   ["garde tes prix à jour ici, c'est ce que verront tes clients","garde tes prix et durées à jour ici, c'est ce que verront tes clientes"],
   ["Définis tes tables et tes horaires","Définis tes praticien·nes et tes horaires"],
@@ -1949,7 +1951,7 @@ window.loadPlanning=async function(){
     var r=await fetch('/api/hub?action=scheduled&blogId='+encodeURIComponent(window.currentBlog)+'&start='+from+'&end='+to);
     var t=await r.text();var j;try{j=JSON.parse(t);}catch(e){j=null;}
     var list=((j&&(j.data||j))||[]).filter(function(p){return p&&p.draft===true;});
-    if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:14px">Aucun brouillon à valider. Crée un post avec « + Nouveau post ».</div>';return;}
+    if(!list.length){el.innerHTML='<div style="color:var(--muted);font-size:14px;line-height:1.6">Aucun brouillon à valider.<br>Crée un post avec « + Nouveau post ».</div>';return;}
     list.sort(function(a,b){return (schedDate(a)||'').localeCompare(schedDate(b)||'');});
     el.innerHTML='';
     list.forEach(function(p){
@@ -2240,7 +2242,7 @@ window.renderReferral=async function(){
   var blog=window.currentBlog||'';
   if(!blog){card.style.display='none';return;}
   card.style.display='flex';
-  var link=location.origin+'/parrainage.html?ref='+encodeURIComponent(blog);
+  var link='https://hospireclub.com/?ref='+encodeURIComponent(blog);
   var inp=document.getElementById('refLink');if(inp)inp.value=link;
   var wa=document.getElementById('refWa');
   if(wa)wa.href='https://wa.me/?text='+encodeURIComponent("Je te partage .HOSPIRE, ça m'aide vraiment pour mes réseaux et mes rendez-vous en ligne. Regarde : "+link);
