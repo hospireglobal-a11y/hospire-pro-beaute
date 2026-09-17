@@ -95,6 +95,21 @@ module.exports = async function handler(req, res) {
     }
     return null;
   }
+  // Pauses "en ligne" (Je m'absente) : plages où la prise de RDV en ligne est bloquée.
+  // N'affecte PAS les réservations manuelles (créées dans l'app).
+  function activePauses() {
+    const arr = Array.isArray(cfg.pauses) ? cfg.pauses : [];
+    const now = Date.now(), out = [];
+    arr.forEach(function (p) {
+      if (!p) return;
+      const s = Date.parse(p.from), e = Date.parse(p.to);
+      if (isNaN(s) || isNaN(e) || e <= s) return;
+      if (e < now) return; // pause déjà terminée
+      out.push({ s: s, e: e });
+    });
+    return out;
+  }
+  function inPause(pauses, sMs, eMs) { return pauses.some(function (p) { return p.s < eMs && p.e > sMs; }); }
 
   // ----- BEAUTÉ GET : disponibilité (durée de la prestation, praticien optionnel) -----
   if (beauty && req.method === "GET") {
@@ -109,8 +124,10 @@ module.exports = async function handler(req, res) {
     const wins = windows[wkey] || [];
     if (!wins.length) return json(res, 200, { slots: [], reason: "closed" });
     const existing = await dayResaStaff(date);
+    const pauses = activePauses();
     const now = Date.now();
     const slots = [];
+    let pausedHit = false;
     wins.forEach(function (w) {
       const a = parseHM(w.start), z = parseHM(w.end);
       if (a == null || z == null) return;
@@ -118,9 +135,12 @@ module.exports = async function handler(req, res) {
         const sUtc = zonedToUtc(date, hm(t), tz).getTime();
         if (sUtc < now + 60 * 60 * 1000) continue;
         const eUtc = sUtc + dur * 60000;
-        if (freeStaff(cands, existing, sUtc, eUtc)) slots.push(hm(t));
+        if (!freeStaff(cands, existing, sUtc, eUtc)) continue;
+        if (inPause(pauses, sUtc, eUtc)) { pausedHit = true; continue; } // créneau bloqué (absence)
+        slots.push(hm(t));
       }
     });
+    if (!slots.length && pausedHit) return json(res, 200, { slots: [], reason: "paused", staff: staff });
     return json(res, 200, { slots: slots, dur: dur, staff: staff });
   }
 
@@ -141,6 +161,7 @@ module.exports = async function handler(req, res) {
     if (!staff.length) return json(res, 400, { error: "Réservation en ligne non configurée" });
     const sUtc = zonedToUtc(date, time, tz);
     const eUtc = new Date(sUtc.getTime() + dur * 60000);
+    if (inPause(activePauses(), sUtc.getTime(), eUtc.getTime())) return json(res, 409, { error: "Nous ne prenons pas de rendez-vous en ligne sur ce créneau. Merci de choisir un autre moment 🙏" });
     const wantStaff = String(b.staffId || "").trim();
     const cands = wantStaff ? staff.filter(function (s) { return s.id === wantStaff; }) : staff;
     if (!cands.length) return json(res, 409, { error: "Praticien indisponible." });
@@ -199,8 +220,10 @@ module.exports = async function handler(req, res) {
     const wins = windows[wkey] || [];
     if (!wins.length) return json(res, 200, { slots: [], reason: "closed" });
     const existing = await dayReservations(date);
+    const pausesR = activePauses();
     const now = Date.now();
     const slots = [];
+    let pausedHitR = false;
     wins.forEach(function (w) {
       const a = parseHM(w.start), z = parseHM(w.end);
       if (a == null || z == null) return;
@@ -208,9 +231,12 @@ module.exports = async function handler(req, res) {
         const sUtc = zonedToUtc(date, hm(t), tz).getTime();
         if (sUtc < now + 60 * 60 * 1000) continue; // au moins 1h à l'avance
         const eUtc = sUtc + turn * 60000;
-        if (freeTable(cands, existing, sUtc, eUtc)) slots.push(hm(t));
+        if (!freeTable(cands, existing, sUtc, eUtc)) continue;
+        if (inPause(pausesR, sUtc, eUtc)) { pausedHitR = true; continue; }
+        slots.push(hm(t));
       }
     });
+    if (!slots.length && pausedHitR) return json(res, 200, { slots: [], reason: "paused", turn: turn });
     return json(res, 200, { slots: slots, turn: turn });
   }
 
@@ -310,6 +336,7 @@ module.exports = async function handler(req, res) {
 
     const sUtc = zonedToUtc(date, time, tz);
     const eUtc = new Date(sUtc.getTime() + turn * 60000);
+    if (inPause(activePauses(), sUtc.getTime(), eUtc.getTime())) return json(res, 409, { error: "Nous ne prenons pas de réservation en ligne sur ce créneau. Merci de choisir un autre moment 🙏" });
     const cands = tablesFor(party);
     if (!cands.length) return json(res, 409, { error: "Aucune table ne peut accueillir " + party + " personnes." });
 
