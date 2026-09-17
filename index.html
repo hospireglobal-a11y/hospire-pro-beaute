@@ -585,6 +585,18 @@
   <!-- DASH -->
   <section class="page on" id="dash">
     <div class="shead"><div><div class="t" id="brandTitle">.HOSPIRE</div><div class="m"><span class="live">en direct</span> · Tes réseaux · 30 derniers jours</div></div><button class="btn gold" onclick="openHospi()">✦ Demander à Hospi</button></div>
+    <div class="card hoverable" id="refCard" style="margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between">
+      <div style="flex:1;min-width:240px">
+        <h3 style="margin:0 0 4px">Recommander .HOSPIRE ♡</h3>
+        <p style="font-size:13.5px;color:var(--muted);margin:0 0 12px;line-height:1.55">Tu connais un·e collègue qui galère avec ses réseaux ou ses réservations ? Partage-lui ton lien : on s'occupe du reste, et on garde une trace de chaque recommandation venant de toi.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="refLink" readonly style="flex:1;min-width:200px;font-size:12.5px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--muted)">
+          <button class="btn gold sm" id="refCopyBtn" onclick="copyRefLink()">Copier le lien</button>
+          <a class="btn ghost sm" id="refWa" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+      <div style="text-align:center;padding:0 8px"><div class="disp" id="refCount" style="font-size:40px;font-weight:600;line-height:1">—</div><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600">Mes parrainages</div></div>
+    </div>
     <div class="band">
       <div class="cell"><div class="lbl">Abonnés</div><div class="num" id="d_foll">—</div><div class="delta">au total</div></div>
       <div class="cell"><div class="lbl">Croissance · 30j</div><div class="num" id="d_growth">—</div><div class="delta up">abonnés</div></div>
@@ -1301,7 +1313,7 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
   function draw(s){var c=$('chart');if(!c)return;if(chart)chart.destroy();var ctx=c.getContext('2d');
     var _ac=chartAccent();var grad=ctx.createLinearGradient(0,0,0,250);grad.addColorStop(0,'rgba('+_ac.rgb+',.28)');grad.addColorStop(1,'rgba('+_ac.rgb+',0)');
     chart=new Chart(c,{type:'line',data:{labels:s.map(p=>dlab(p.x)),datasets:[{data:s.map(p=>p.y),borderColor:_ac.line,backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.05)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:8}}}}});}
-  async function load(){if(!cur)return;window.currentBlog=cur;if(window.loadProfile)window.loadProfile();
+  async function load(){if(!cur)return;window.currentBlog=cur;if(window.loadProfile)window.loadProfile();if(window.renderReferral)window.renderReferral();
     var foll=await api('timeline',{blogId:cur,network:'instagram',subject:'account',metric:'followers',start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
     var fv=(foll&&foll.data&&foll.data[0]&&foll.data[0].values)||[];
     var s=ser(fv).sort(function(a,b){return new Date(a.x)-new Date(b.x);});
@@ -2221,6 +2233,32 @@ window.loadResa=async function(){
     }catch(e){}
   } else set('rs_up','—');
   if(typeof renderPauseBanner==='function')renderPauseBanner();
+};
+/* ===== Parrainage (« Recommander .HOSPIRE ») ===== */
+window.renderReferral=async function(){
+  var card=document.getElementById('refCard');if(!card)return;
+  var blog=window.currentBlog||'';
+  if(!blog){card.style.display='none';return;}
+  card.style.display='flex';
+  var link=location.origin+'/parrainage.html?ref='+encodeURIComponent(blog);
+  var inp=document.getElementById('refLink');if(inp)inp.value=link;
+  var wa=document.getElementById('refWa');
+  if(wa)wa.href='https://wa.me/?text='+encodeURIComponent("Je te partage .HOSPIRE, ça m'aide vraiment pour mes réseaux et mes rendez-vous en ligne. Regarde : "+link);
+  // compteur
+  var cEl=document.getElementById('refCount');
+  if(typeof sb!=='undefined'&&sb){
+    try{var r=await sb.from('referrals').select('id',{count:'exact',head:true}).eq('referrer_blog',String(blog));
+      if(cEl)cEl.textContent=(r&&r.count!=null)?r.count:'0';
+    }catch(e){if(cEl)cEl.textContent='0';}
+  }else if(cEl)cEl.textContent='0';
+};
+window.copyRefLink=function(){
+  var inp=document.getElementById('refLink');if(!inp)return;
+  var btn=document.getElementById('refCopyBtn');var old=btn?btn.textContent:'';
+  var done=function(){if(btn){btn.textContent='✓ Copié !';setTimeout(function(){btn.textContent=old||'Copier le lien';},1600);}};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value).then(done,function(){inp.select();document.execCommand('copy');done();});}
+    else{inp.select();document.execCommand('copy');done();}
+  }catch(e){inp.select();try{document.execCommand('copy');done();}catch(_){}}
 };
 /* ===== Absences en ligne (« Je m'absente ») — bloque la résa en ligne, pas le manuel ===== */
 function _dtLocal(d){var p=function(n){return('0'+n).slice(-2);};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
