@@ -56,6 +56,13 @@
   body.beauty input:focus,body.beauty select:focus,body.beauty textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,143,168,.16)}
   body.beauty .ok .ico{background:rgba(232,143,168,.14);color:#D97E97}
   body.beauty .gbanner{background:rgba(232,143,168,.12);border-color:rgba(232,143,168,.35);color:#b5567f}
+  .prestaRow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .prestaRow select{flex:1}
+  .rmPresta{flex:0 0 auto;width:38px;height:44px;border:1px solid var(--line);background:#fff;border-radius:10px;color:var(--muted);font-size:15px;cursor:pointer;line-height:1}
+  .rmPresta:hover{border-color:var(--gold);color:var(--gold)}
+  .addPresta{border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:9px 12px;font-size:13.5px;cursor:pointer;width:100%}
+  .addPresta:hover{border-color:var(--gold);color:var(--gold)}
+  #prestaTotal{margin-top:8px;font-size:13px;color:var(--gold);font-weight:600}
 </style>
 </head>
 <body>
@@ -70,7 +77,7 @@
 
   <!-- ÉTAPE 1 : créneau -->
   <div class="card" id="step1">
-    <div class="field" id="fieldPresta" style="display:none"><label>Prestation</label><select id="presta"></select></div>
+    <div class="field" id="fieldPresta" style="display:none"><label>Prestation(s)</label><div id="prestaList"></div><button type="button" class="addPresta" id="addPresta">+ Ajouter une prestation</button><div id="prestaTotal"></div></div>
     <div class="field" id="fieldStaff" style="display:none"><label>Avec qui ?</label><select id="staff"></select></div>
     <div class="row">
       <div class="field" id="fieldParty"><label>Personnes</label><select id="party"></select></div>
@@ -177,7 +184,7 @@ $('brand').textContent=NAME;
     var fa=$('fieldAllergens');if(fa){fa.querySelector('label').textContent='Remarque santé / allergie (optionnel)';fa.querySelector('input').placeholder='Ongles fragiles, grossesse, allergie…';}
     $('fieldPresta').style.display='';
     var sb2=$('submit');if(sb2)sb2.textContent='Confirmer';
-    $('presta').onchange=onPrestaChange;
+    $('addPresta').onclick=function(){addPrestaRow();};
     $('staff').onchange=loadSlots;
     d.onchange=loadSlots;
     if(!BLOG){showMsg("Lien de rendez-vous invalide (établissement manquant).");}
@@ -192,29 +199,56 @@ $('brand').textContent=NAME;
   else loadSlots();
 })();
 
-/* ===== BEAUTÉ : prestations + praticien ===== */
+/* ===== BEAUTÉ : prestations (jusqu'à 3) + praticien ===== */
+var PRESTA_OPTS='';        // HTML des <optgroup> mis en cache pour cloner les selects
+var MAX_PRESTA=3;
 async function initBeauty(){
   // 1) Charger les prestations (avec durée) depuis /api/site
   try{
     var r=await fetch('/api/site?b='+encodeURIComponent(BLOG));var j=await r.json();
     var carte=(j&&j.carte)||[];
     var opts=carte.filter(function(d){return d&&d.name&&parseInt(d.dur,10)>0;});
-    var ps=$('presta');ps.innerHTML='';
     if(!opts.length){showMsg("Prise de rendez-vous bientôt disponible.");return;}
     var groups={};opts.forEach(function(d){var g=d.menu||'Prestations';(groups[g]=groups[g]||[]).push(d);});
+    var tmp=document.createElement('select');
     Object.keys(groups).forEach(function(g){
       var og=document.createElement('optgroup');og.label=g;
       groups[g].forEach(function(d){var o=document.createElement('option');o.value=d.dur;o.setAttribute('data-name',d.name);o.textContent=d.name+' · '+d.dur+' min'+(d.price?(' · '+d.price):'');og.appendChild(o);});
-      ps.appendChild(og);
+      tmp.appendChild(og);
     });
-    var first=ps.options[0];sel.dur=parseInt(first.value,10)||0;sel.service=first.getAttribute('data-name')||'';
+    PRESTA_OPTS=tmp.innerHTML;
+    $('prestaList').innerHTML='';
+    addPrestaRow();          // 1re prestation + calcul initial
   }catch(e){showMsg("Erreur de chargement. Réessaie.");return;}
-  // 2) Charger la liste des praticien·nes (via une 1re dispo)
-  loadSlots();
 }
-function onPrestaChange(){
-  var o=$('presta').options[$('presta').selectedIndex];
-  sel.dur=parseInt(o.value,10)||0;sel.service=o.getAttribute('data-name')||'';
+function buildPrestaSelect(){
+  var s=document.createElement('select');s.className='presta';s.innerHTML=PRESTA_OPTS;s.onchange=recomputePresta;return s;
+}
+function addPrestaRow(){
+  var list=$('prestaList');if(list.children.length>=MAX_PRESTA)return;
+  var row=document.createElement('div');row.className='prestaRow';
+  row.appendChild(buildPrestaSelect());
+  if(list.children.length>0){
+    var rm=document.createElement('button');rm.type='button';rm.className='rmPresta';rm.textContent='✕';rm.title='Retirer';
+    rm.onclick=function(){row.remove();refreshAddBtn();recomputePresta();};
+    row.appendChild(rm);
+  }
+  list.appendChild(row);refreshAddBtn();recomputePresta();
+}
+function refreshAddBtn(){
+  var n=$('prestaList').children.length;
+  $('addPresta').style.display=(n>=MAX_PRESTA)?'none':'';
+}
+function recomputePresta(){
+  var sels=$('prestaList').querySelectorAll('select.presta');
+  var names=[],total=0;
+  [].forEach.call(sels,function(s){
+    var o=s.options[s.selectedIndex];if(!o)return;
+    total+=parseInt(o.value,10)||0;
+    var nm=o.getAttribute('data-name')||'';if(nm)names.push(nm);
+  });
+  sel.dur=total;sel.service=names.join(' + ');
+  $('prestaTotal').textContent=(sels.length>1)?(names.length+' prestations · '+total+' min au total'):'';
   loadSlots();
 }
 function fillStaff(list){

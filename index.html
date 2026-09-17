@@ -987,7 +987,7 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" id="nr_title" style="font-size:22px;font-weight:600">Nouvelle réservation</div><span onclick="document.getElementById('newResaModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
   <div class="field"><label>Nom du client</label><input id="nr_name" placeholder="Fam. Bernard"></div>
   <div class="field"><label>Date et heure</label><input type="datetime-local" id="nr_dt"></div>
-  <div class="field" id="nrf_presta" style="display:none"><label>Prestation</label><select id="nr_presta"></select></div>
+  <div class="field" id="nrf_presta" style="display:none"><label>Prestation(s)</label><div id="nr_prestaList"></div><button type="button" id="nr_addPresta" class="btn ghost" style="width:100%;margin-top:2px;font-size:13px;padding:9px">+ Ajouter une prestation</button><div id="nr_prestaTotal" style="margin-top:6px;font-size:12.5px;color:var(--gold);font-weight:600"></div></div>
   <div class="field" id="nrf_staff" style="display:none"><label>Avec qui ?</label><select id="nr_staff"></select></div>
   <div style="display:flex;gap:12px">
     <div class="field" id="nrf_adults" style="flex:1"><label>Adultes</label><input type="number" id="nr_adults" min="1" value="2"></div>
@@ -2392,11 +2392,14 @@ window.openNewResa=async function(){
   if(_isBeauty()){
     var carte=(window.__site&&window.__site.carte)||[];
     if(!carte.length){try{var rs=await fetch('/api/site?b='+encodeURIComponent(window.currentBlog));var js=await rs.json();carte=(js&&js.carte)||[];}catch(e){}}
-    var ps=document.getElementById('nr_presta');ps.innerHTML='';
-    carte.filter(function(d){return d&&d.name&&parseInt(d.dur,10)>0;}).forEach(function(d){var o=document.createElement('option');o.value=d.dur;o.setAttribute('data-name',d.name);o.textContent=d.name+' · '+d.dur+' min';ps.appendChild(o);});
+    var tmpP=document.createElement('select');
+    carte.filter(function(d){return d&&d.name&&parseInt(d.dur,10)>0;}).forEach(function(d){var o=document.createElement('option');o.value=d.dur;o.setAttribute('data-name',d.name);o.textContent=d.name+' · '+d.dur+' min';tmpP.appendChild(o);});
+    window.__nrPrestaOpts=tmpP.innerHTML;
+    document.getElementById('nr_prestaList').innerHTML='';
+    _nrAddPrestaRow();
     var ss=document.getElementById('nr_staff');ss.innerHTML='<option value="">Sans préférence</option>';
     (window.__resaStaff||[]).forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.name;ss.appendChild(o);});
-    document.getElementById('nrf_presta').style.display=ps.options.length?'':'none';
+    document.getElementById('nrf_presta').style.display=tmpP.options.length?'':'none';
     document.getElementById('nrf_staff').style.display=((window.__resaStaff||[]).length>1)?'':'none';
     document.getElementById('nrf_adults').style.display='none';
     document.getElementById('nrf_children').style.display='none';
@@ -2420,8 +2423,15 @@ window.resaEdit=async function(){
   set('nr_name',x.name);set('nr_phone',x.phone);set('nr_email',x.email);set('nr_notes',x.notes);
   var src=document.getElementById('nr_src');if(src&&x.source){var ok=false;[].forEach.call(src.options,function(o){if(o.value===x.source)ok=true;});if(ok)src.value=x.source;}
   if(_isBeauty()){
-    var ps=document.getElementById('nr_presta');
-    if(ps&&x.service){[].forEach.call(ps.options,function(o){if((o.getAttribute('data-name')||'')===x.service)ps.value=o.value;});}
+    var parts=String(x.service||'').split(' + ').map(function(s){return s.trim();}).filter(Boolean);
+    var list=document.getElementById('nr_prestaList');
+    if(list){
+      list.innerHTML='';
+      (parts.length?parts:['']).forEach(function(){_nrAddPrestaRow();});
+      var rows=list.querySelectorAll('select.nr-presta');
+      parts.forEach(function(nm,i){var s=rows[i];if(!s)return;[].forEach.call(s.options,function(o){if((o.getAttribute('data-name')||'')===nm)s.value=o.value;});});
+      _nrRecomputePresta();
+    }
     var ss=document.getElementById('nr_staff');if(ss)ss.value=(x.staff_id!=null?String(x.staff_id):'');
   }else{
     set('nr_allergens',x.allergens);
@@ -2468,12 +2478,33 @@ function _beautyWithinHours(dt,dur){
   for(var i=0;i<wins.length;i++){var s=_hm(wins[i].start),e=_hm(wins[i].end);if(s!=null&&e!=null&&startMin>=s&&endMin<=e)return true;}
   return false;
 }
+/* Multi-prestation (app, création manuelle) : jusqu'à 3 prestations consécutives */
+var NR_MAX_PRESTA=3;
+function _nrBuildPrestaSelect(){var s=document.createElement('select');s.className='nr-presta';s.innerHTML=window.__nrPrestaOpts||'';s.onchange=_nrRecomputePresta;return s;}
+function _nrAddPrestaRow(){
+  var list=document.getElementById('nr_prestaList');if(!list||list.children.length>=NR_MAX_PRESTA)return;
+  var row=document.createElement('div');row.className='nr-presta-row';row.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px';
+  var s=_nrBuildPrestaSelect();s.style.flex='1';row.appendChild(s);
+  if(list.children.length>0){
+    var rm=document.createElement('button');rm.type='button';rm.textContent='✕';rm.title='Retirer';
+    rm.style.cssText='flex:0 0 auto;width:38px;height:40px;border:1px solid var(--line);background:transparent;border-radius:10px;color:var(--muted);cursor:pointer';
+    rm.onclick=function(){row.parentNode.removeChild(row);_nrRefreshAddBtn();_nrRecomputePresta();};
+    row.appendChild(rm);
+  }
+  list.appendChild(row);_nrRefreshAddBtn();_nrRecomputePresta();
+}
+function _nrRefreshAddBtn(){var b=document.getElementById('nr_addPresta');if(!b)return;var n=document.getElementById('nr_prestaList').children.length;b.style.display=(n>=NR_MAX_PRESTA)?'none':'';}
+function _nrReadPresta(){
+  var sels=document.querySelectorAll('#nr_prestaList select.nr-presta');var names=[],total=0;
+  [].forEach.call(sels,function(s){var o=s.options[s.selectedIndex];if(!o)return;total+=parseInt(o.value,10)||0;var nm=o.getAttribute('data-name')||'';if(nm)names.push(nm);});
+  return {dur:total,service:names.join(' + '),count:names.length};
+}
+function _nrRecomputePresta(){var r=_nrReadPresta();var t=document.getElementById('nr_prestaTotal');if(t)t.textContent=(r.count>1)?(r.count+' prestations · '+r.dur+' min au total'):'';}
 async function resaCreateBeauty(){
   var g=function(id){var e=document.getElementById(id);return e?(e.value||'').trim():'';};
   var res=document.getElementById('nr_res');
   var name=g('nr_name'),dt=g('nr_dt'),src=g('nr_src'),phone=g('nr_phone'),email=g('nr_email'),notes=g('nr_notes');
-  var ps=document.getElementById('nr_presta');var po=ps&&ps.options[ps.selectedIndex];
-  var dur=po?(parseInt(po.value,10)||0):0;var service=po?(po.getAttribute('data-name')||''):'';
+  var _p=_nrReadPresta();var dur=_p.dur,service=_p.service;
   var staffId=(document.getElementById('nr_staff')&&document.getElementById('nr_staff').value)||'';
   var editId=window.__editResaId||null;
   var prev=editId?(__resaCache||[]).filter(function(r){return r.id===editId;})[0]:null;
