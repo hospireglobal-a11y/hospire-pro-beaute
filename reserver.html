@@ -275,7 +275,7 @@ async function loadSlotsBeauty(){
     var slots=(j&&j.slots)||[];
     if(!slots.length){
       var reason=(j&&j.reason)||'';
-      var m=reason==='no_staff'?"Prise de rendez-vous bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":"Complet ce jour — essaie une autre date.";
+      var m=reason==='no_staff'?"Prise de rendez-vous bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='paused'?"Pas de rendez-vous en ligne ce jour — choisis une autre date 🌸":"Complet ce jour — essaie une autre date.";
       showMsg(m);return;
     }
     $('slots').innerHTML='';
@@ -295,7 +295,7 @@ async function loadSlots(){
     if(j&&j.turn)sel.turn=j.turn;
     if(!slots.length){
       var reason=(j&&j.reason)||'';
-      var m=reason==='no_tables'?"Réservation en ligne bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='party_too_big'?("Pour "+sel.party+" personnes, contacte-nous directement."):"Complet ce jour — essaie une autre date.";
+      var m=reason==='no_tables'?"Réservation en ligne bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='paused'?"Pas de réservation en ligne ce jour — choisis une autre date.":reason==='party_too_big'?("Pour "+sel.party+" personnes, contacte-nous directement."):"Complet ce jour — essaie une autre date.";
       showMsg(m);return;
     }
     $('slots').innerHTML='';

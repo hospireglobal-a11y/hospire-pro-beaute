@@ -739,9 +739,10 @@
     <div class="subnav" data-group="site"><button class="on" data-sp="s_resa">Réservations</button><button data-sp="s_carte">Carte & horaires</button><button data-sp="s_widget">Widget</button></div>
     <div class="subpage on" id="s_resa">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn gold sm" onclick="openNewResa()">+ Nouvelle réservation</button><button class="btn ghost sm" onclick="openResaConfig()">⚙ Configuration</button></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn gold sm" onclick="openNewResa()">+ Nouvelle réservation</button><button class="btn ghost sm" id="pauseBtn" onclick="openPauseModal()">🌙 Je m'absente</button><button class="btn ghost sm" onclick="openResaConfig()">⚙ Configuration</button></div>
         <div style="display:flex;align-items:center;gap:8px"><button class="btn ghost sm" onclick="resaWeek(-1)">‹</button><span class="eyebrow" id="rs_weeklabel" style="margin:0">—</span><button class="btn ghost sm" onclick="resaWeek(1)">›</button></div>
       </div>
+      <div id="resaPauseBanner" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:14px;background:rgba(232,143,168,.12);border:1px solid rgba(232,143,168,.4);color:#b5567f;font-size:13.5px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px" class="g4stat">
         <div class="card"><div style="font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600">Couverts · semaine</div><div class="disp" id="rs_covers" style="font-size:36px;font-weight:600;margin-top:8px">—</div><div style="color:var(--muted);font-size:12.5px">cette semaine</div></div>
         <div class="card"><div style="font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600">Réservations</div><div class="disp" id="rs_count" style="font-size:36px;font-weight:600;margin-top:8px">—</div><div style="color:var(--muted);font-size:12.5px">cette semaine</div></div>
@@ -1022,6 +1023,27 @@
   <div id="cf_res" style="font-size:13px;margin:10px 0"></div>
   <div style="display:flex;gap:10px"><button class="btn gold" style="flex:1" onclick="saveResaConfig()">Enregistrer la configuration</button><button class="btn ghost" onclick="document.getElementById('resaConfigModal').style.display='none'">Fermer</button></div>
 </div></div>
+
+<div id="pauseModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px">
+  <div class="m" style="background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:440px;max-width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="disp" style="font-size:22px;font-weight:600">Je m'absente</div><span onclick="document.getElementById('pauseModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 16px">Bloque la prise de rendez-vous <b>en ligne</b> sur une période (formation, congé, imprévu…). Tu peux toujours ajouter des rendez-vous à la main. Les clients verront un message les invitant à choisir une autre date.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn ghost sm" onclick="pausePreset('today')">Le reste de la journée</button>
+      <button class="btn ghost sm" onclick="pausePreset('tomorrow')">Jusqu'à demain</button>
+      <button class="btn ghost sm" onclick="pausePreset('week')">Toute la semaine</button>
+    </div>
+    <div style="display:flex;gap:12px">
+      <div class="field" style="flex:1"><label>De</label><input type="datetime-local" id="pz_from"></div>
+      <div class="field" style="flex:1"><label>Jusqu'à</label><input type="datetime-local" id="pz_to"></div>
+    </div>
+    <div class="field"><label>Motif (optionnel, privé)</label><input id="pz_reason" placeholder="Formation, congé…"></div>
+    <div id="pz_res" style="font-size:13px;margin:8px 0"></div>
+    <div style="display:flex;gap:10px;margin-bottom:18px"><button class="btn gold" style="flex:1" onclick="savePause()">Bloquer cette période</button><button class="btn ghost" onclick="document.getElementById('pauseModal').style.display='none'">Annuler</button></div>
+    <div style="margin:6px 0 4px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600">Absences programmées</div>
+    <div id="pz_list" style="font-size:13px"></div>
+  </div>
+</div>
 
 <div id="composeModal" style="display:none;position:fixed;inset:0;z-index:57;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px">
   <div class="m" style="background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:520px;max-width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)">
@@ -2198,6 +2220,81 @@ window.loadResa=async function(){
       if(h){if(pc&&pc.count){h.innerHTML='⏳ '+pc.count+' demande'+(pc.count>1?'s':'')+' de groupe à confirmer — clique dessus dans le calendrier';h.style.color='var(--gold,#C4A265)';h.style.fontWeight='700';}else{h.textContent='Clique une réservation pour la fiche';h.style.color='';h.style.fontWeight='';}}
     }catch(e){}
   } else set('rs_up','—');
+  if(typeof renderPauseBanner==='function')renderPauseBanner();
+};
+/* ===== Absences en ligne (« Je m'absente ») — bloque la résa en ligne, pas le manuel ===== */
+function _dtLocal(d){var p=function(n){return('0'+n).slice(-2);};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
+function _pauseFmt(iso){try{return new Date(iso).toLocaleString((window.__loc||'fr-FR'),{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return iso;}}
+function _pauses(){return (window.__resaCfg&&Array.isArray(window.__resaCfg.pauses))?window.__resaCfg.pauses:[];}
+window.openPauseModal=async function(){
+  if((!window.__resaCfg||!Object.keys(window.__resaCfg).length)&&typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}}
+  var now=new Date();var end=new Date();end.setHours(23,59,0,0);
+  var f=document.getElementById('pz_from'),t=document.getElementById('pz_to');
+  if(f)f.value=_dtLocal(now);if(t)t.value=_dtLocal(end);
+  document.getElementById('pz_reason').value='';document.getElementById('pz_res').textContent='';
+  renderPauseList();
+  document.getElementById('pauseModal').style.display='flex';
+};
+window.pausePreset=function(kind){
+  var from=new Date(),to=new Date();
+  if(kind==='today'){to.setHours(23,59,0,0);}
+  else if(kind==='tomorrow'){to.setDate(to.getDate()+1);to.setHours(23,59,0,0);}
+  else if(kind==='week'){var dow=(to.getDay()+6)%7;to.setDate(to.getDate()+(6-dow));to.setHours(23,59,0,0);}
+  document.getElementById('pz_from').value=_dtLocal(from);
+  document.getElementById('pz_to').value=_dtLocal(to);
+};
+async function _persistCfg(res){
+  try{await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()});return true;}
+  catch(e){if(res){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}return false;}
+}
+window.savePause=async function(){
+  var res=document.getElementById('pz_res');
+  var fv=document.getElementById('pz_from').value,tv=document.getElementById('pz_to').value;
+  var reason=(document.getElementById('pz_reason').value||'').trim();
+  if(!fv||!tv){res.style.color='var(--rouge)';res.textContent='Indique le début et la fin.';return;}
+  var from=new Date(fv),to=new Date(tv);
+  if(!(to>from)){res.style.color='var(--rouge)';res.textContent='La fin doit être après le début.';return;}
+  if(typeof sb==='undefined'||!sb||!window.currentBlog){res.style.color='var(--rouge)';res.textContent='Connecte-toi pour enregistrer.';return;}
+  if(!window.__resaCfg)window.__resaCfg={};
+  if(!Array.isArray(window.__resaCfg.pauses))window.__resaCfg.pauses=[];
+  window.__resaCfg.pauses.push({id:'p'+Date.now(),from:from.toISOString(),to:to.toISOString(),reason:reason});
+  res.style.color='var(--muted)';res.textContent='Enregistrement…';
+  if(await _persistCfg(res)){res.style.color='var(--vert)';res.textContent='✓ Période bloquée.';renderPauseList();renderPauseBanner();}
+};
+window.removePause=async function(id){
+  if(!window.__resaCfg||!Array.isArray(window.__resaCfg.pauses))return;
+  window.__resaCfg.pauses=window.__resaCfg.pauses.filter(function(p){return p.id!==id;});
+  var res=document.getElementById('pz_res');
+  if(await _persistCfg(res)){if(res){res.style.color='var(--vert)';res.textContent='✓ Absence retirée.';}renderPauseList();renderPauseBanner();}
+};
+function renderPauseList(){
+  var box=document.getElementById('pz_list');if(!box)return;
+  var now=Date.now();
+  var list=_pauses().filter(function(p){return Date.parse(p.to)>now;}).sort(function(a,b){return Date.parse(a.from)-Date.parse(b.from);});
+  if(!list.length){box.innerHTML='<div style="color:var(--muted);font-size:12.5px">Aucune absence programmée.</div>';return;}
+  box.innerHTML=list.map(function(p){
+    var active=Date.parse(p.from)<=now&&Date.parse(p.to)>now;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)">'+
+      '<div style="font-size:12.5px">'+(active?'<b style="color:#b5567f">● En cours</b> · ':'')+_pauseFmt(p.from)+' → '+_pauseFmt(p.to)+(p.reason?('<br><span style="color:var(--muted)">'+_esc(p.reason)+'</span>'):'')+'</div>'+
+      '<button class="btn ghost sm" onclick="removePause(\''+p.id+'\')">Retirer</button></div>';
+  }).join('');
+}
+function renderPauseBanner(){
+  var b=document.getElementById('resaPauseBanner');if(!b)return;
+  var now=Date.now();
+  var act=_pauses().filter(function(p){return Date.parse(p.from)<=now&&Date.parse(p.to)>now;}).sort(function(a,b){return Date.parse(a.to)-Date.parse(b.to);});
+  if(!act.length){b.style.display='none';return;}
+  var end=act[act.length-1].to;
+  b.style.display='flex';
+  b.innerHTML='<span>🌙 <b>Réservations en ligne en pause</b> jusqu\'au '+_pauseFmt(end)+'. Tu peux toujours ajouter des rendez-vous à la main.</span>'+
+    '<button class="btn gold sm" onclick="reactivateOnline()">Réactiver maintenant</button>';
+}
+window.reactivateOnline=async function(){
+  var now=Date.now();
+  if(!window.__resaCfg||!Array.isArray(window.__resaCfg.pauses))return;
+  // termine toute pause en cours (fin = maintenant), garde les pauses futures
+  window.__resaCfg.pauses=window.__resaCfg.pauses.filter(function(p){return !(Date.parse(p.from)<=now&&Date.parse(p.to)>now);});
+  if(await _persistCfg(null)){renderPauseBanner();if(document.getElementById('pauseModal').style.display==='flex')renderPauseList();}
 };
 /* En retard : confirmée, non arrivée, heure dépassée (10 min de marge), dans les 6 h */
 function _resaLate(x){if(!x||x.status!=='confirmed')return false;var dt=new Date(x.date_time).getTime(),now=Date.now();return now>dt+10*60000&&now<dt+6*3600000;}
@@ -2656,6 +2753,7 @@ window.saveResaConfig=async function(){
   var prevCfg=window.__resaCfg||{};
   window.__resaCfg={turn:turn,step:step,windows:windows,phone:phone,email:email,name:rname};
   if(prevCfg.mode)window.__resaCfg.mode=prevCfg.mode;     // ne jamais perdre le mode (sinon la résa beauté casse)
+  if(prevCfg.pauses)window.__resaCfg.pauses=prevCfg.pauses; // ne pas perdre les absences en ligne
   if(_isBeauty())window.__resaCfg.mode='beauty';
   res.style.color='var(--muted)';res.textContent='Enregistrement…';
   try{
