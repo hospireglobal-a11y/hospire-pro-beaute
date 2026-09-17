@@ -128,7 +128,7 @@ module.exports = async function handler(req, res) {
   if (beauty && req.method === "POST" && !b.action && !(b.group === true || b.group === "true" || b.mode === "group")) {
     const date = String(b.date || "").trim(), time = String(b.time || "").trim();
     const dur = reqDur(b.dur || b.service_dur);
-    const service = String(b.service || "").trim().slice(0, 120);
+    const service = String(b.service || "").trim().slice(0, 200);
     const name = String(b.name || "").trim().slice(0, 120);
     const phone = String(b.phone || "").trim().slice(0, 40);
     const email = String(b.email || "").trim().slice(0, 160);
