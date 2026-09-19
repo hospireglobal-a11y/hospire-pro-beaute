@@ -98,7 +98,7 @@
       <div class="field"><label>Téléphone</label><input id="f_phone" placeholder="06 12 34 56 78"></div>
       <div class="field" id="fieldChildren"><label>Dont enfants</label><input type="number" id="f_children" min="0" value="0"></div>
     </div>
-    <div class="field"><label>Email (confirmation)</label><input id="f_email" type="email" placeholder="vous@email.com"></div>
+    <div class="field"><label>Email <span style="color:var(--rouge,#C9564F)">*</span> (confirmation envoyée ici)</label><input id="f_email" type="email" placeholder="vous@email.com" required></div>
     <div class="field" id="fieldAllergens"><label>Allergènes / régime</label><input id="f_allergens" placeholder="Fruits à coque, sans gluten…"></div>
     <div class="field"><label>Message (optionnel)</label><textarea id="f_notes" rows="2" placeholder="Occasion, chaise bébé…"></textarea></div>
     <label class="consent"><input type="checkbox" id="f_consent"><span>J'accepte que mes données soient utilisées pour gérer ma réservation, conformément à la politique de confidentialité de l'établissement.</span></label>
@@ -133,7 +133,7 @@
     <div class="field" style="margin-top:16px"><label>Nom complet</label><input id="g_name" placeholder="Prénom Nom"></div>
     <div class="row">
       <div class="field"><label>Téléphone</label><input id="g_phone" placeholder="06 12 34 56 78"></div>
-      <div class="field"><label>Email</label><input id="g_email" type="email" placeholder="vous@email.com"></div>
+      <div class="field"><label>Email <span style="color:var(--rouge,#C9564F)">*</span> (confirmation envoyée ici)</label><input id="g_email" type="email" placeholder="vous@email.com" required></div>
     </div>
     <div class="field"><label>Allergènes / régime</label><input id="g_allergens" placeholder="Fruits à coque, sans gluten…"></div>
     <div class="field"><label>Message (occasion, besoins…)</label><textarea id="g_notes" rows="2" placeholder="Anniversaire, repas d'entreprise, gâteau…"></textarea></div>
@@ -324,7 +324,7 @@ $('submit').onclick=async function(){
   var name=$('f_name').value.trim(),phone=$('f_phone').value.trim(),email=$('f_email').value.trim();
   var children=parseInt($('f_children').value,10)||0,allergens=$('f_allergens').value.trim(),notes=$('f_notes').value.trim();
   if(!name){return fail("Indique ton nom.");}
-  if(!phone&&!email){return fail("Laisse un téléphone ou un email pour te contacter.");}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){$('f_email').focus();return fail("Indique un email valide : c'est là que tu recevras ta confirmation.");}
   if(!$('f_consent').checked){return fail("Merci d'accepter l'utilisation de tes données.");}
   var btn=$('submit');btn.disabled=true;btn.textContent='Réservation…';
   try{
@@ -391,7 +391,7 @@ $('g_submit').onclick=async function(){
   function gfail(m){err.textContent=m;err.classList.remove('hide');}
   if(!gsel.date||!gsel.time){return gfail("Choisis une date et un créneau.");}
   if(!name){return gfail("Indique ton nom.");}
-  if(!phone&&!email){return gfail("Laisse un téléphone ou un email pour te contacter.");}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){$('g_email').focus();return gfail("Indique un email valide : c'est là que tu recevras ta confirmation.");}
   if(!$('g_consent').checked){return gfail("Merci d'accepter l'utilisation de tes données.");}
   var btn=$('g_submit');btn.disabled=true;btn.textContent='Envoi…';
   try{
