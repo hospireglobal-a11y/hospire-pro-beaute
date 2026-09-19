@@ -156,7 +156,7 @@ module.exports = async function handler(req, res) {
     const brandName = String(b.brandName || "").trim().slice(0, 80) || "L'institut";
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{1,2}:\d{2}$/.test(time)) return json(res, 400, { error: "date/heure invalides" });
     if (!name) return json(res, 400, { error: "Nom requis" });
-    if (!phone && !email) return json(res, 400, { error: "Téléphone ou email requis" });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json(res, 400, { error: "Un email valide est requis pour recevoir la confirmation." });
     if (!b.consent) return json(res, 400, { error: "Consentement requis" });
     if (!staff.length) return json(res, 400, { error: "Réservation en ligne non configurée" });
     const sUtc = zonedToUtc(date, time, tz);
@@ -278,7 +278,7 @@ module.exports = async function handler(req, res) {
     const brandName = String(b.brandName || "").trim().slice(0, 80) || "Le restaurant";
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{1,2}:\d{2}$/.test(time)) return json(res, 400, { error: "date/heure invalides" });
     if (!name || party < 1) return json(res, 400, { error: "Nom et nombre de convives requis" });
-    if (!phone && !email) return json(res, 400, { error: "Téléphone ou email requis" });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json(res, 400, { error: "Un email valide est requis pour recevoir la confirmation." });
     if (!b.consent) return json(res, 400, { error: "Consentement requis" });
     const sUtc = zonedToUtc(date, time, tz);
     const eUtc = new Date(sUtc.getTime() + turn * 60000);
