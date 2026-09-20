@@ -176,7 +176,7 @@ module.exports = async function handler(req, res) {
         blog_id: blogId, name: name, phone: phone, email: email, contact: (phone || email),
         covers: 1, adults: 1, children: 0, date_time: sUtc.toISOString(), end_time: eUtc.toISOString(),
         staff_id: st.id, table_id: null, service: service, service_dur: dur,
-        source: "site", notes: notes, status: "confirmed", consent: true
+        source: "site", notes: notes, status: "confirmed", consent: true, marketing_consent: !!b.marketing
       };
       const ins = await sb("reservations", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload) }, URL, KEY);
       if (ins.ok) { saved = { id: (ins.data && ins.data[0] && ins.data[0].id) || null, staff: st.name }; break; }
@@ -286,7 +286,7 @@ module.exports = async function handler(req, res) {
       blog_id: blogId, name: name, phone: phone, email: email, contact: (phone || email),
       adults: Math.max(1, party - children), children: children, covers: party,
       date_time: sUtc.toISOString(), end_time: eUtc.toISOString(), table_id: null,
-      source: "site-groupe", allergens: allergens, notes: notes, status: "pending", consent: true
+      source: "site-groupe", allergens: allergens, notes: notes, status: "pending", consent: true, marketing_consent: !!b.marketing
     };
     const ins = await sb("reservations", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload) }, URL, KEY);
     if (!ins.ok) return json(res, 500, { error: "Impossible d'enregistrer la demande. Réessaie." });
@@ -355,7 +355,7 @@ module.exports = async function handler(req, res) {
         blog_id: blogId, name: name, phone: phone, email: email,
         contact: (phone || email), adults: Math.max(1, party - children), children: children, covers: party,
         date_time: sUtc.toISOString(), end_time: eUtc.toISOString(), table_id: t.id,
-        source: "site", allergens: allergens, notes: notes, status: "confirmed", consent: true
+        source: "site", allergens: allergens, notes: notes, status: "confirmed", consent: true, marketing_consent: !!b.marketing
       };
       const ins = await sb("reservations", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload) }, URL, KEY);
       if (ins.ok) { saved = { id: (ins.data && ins.data[0] && ins.data[0].id) || null, table: t.name }; break; }
