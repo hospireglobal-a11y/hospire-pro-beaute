@@ -563,6 +563,7 @@
     <a data-sec="contenu">Contenu</a>
     <a data-sec="reputation">Réputation</a>
     <a data-sec="site">Mon site</a>
+    <a data-sec="crm">Mes clients</a>
     <a data-sec="bilan">Bilan</a>
     <a data-sec="communaute">Communauté</a>
     <a data-sec="branding" class="brandingtab">✦ Mon branding</a>
@@ -813,6 +814,32 @@
         </div>
       </div>
       <div class="card" style="margin-top:18px"><h3>Tout est inclus dans ton foyer</h3><p style="font-size:14px;line-height:2">✓ Réservations en ligne sur ton site (widget de marque)<br>✓ Disponibilité réelle par table · zéro double-booking<br>✓ Email de confirmation automatique<br>✓ Calendrier interne (nom · heure · couverts · allergènes)<br>✓ Zéro commission par couvert<br>✓ Tes données t'appartiennent</p></div>
+    </div>
+  </section>
+
+  <!-- MES CLIENTS (CRM + Email marketing) -->
+  <section class="page" id="crm">
+    <div class="shead"><div><div class="t">Mes clients</div><div class="m"><span class="live">à toi</span> · ta base email · marketing sans commission</div></div><button class="btn gold" onclick="openCampaign()">✦ Nouvelle campagne</button></div>
+    <div class="band">
+      <div class="cell"><div class="lbl">Clients</div><div class="num" id="crm_total">—</div><div class="delta">emails uniques</div></div>
+      <div class="cell"><div class="lbl">Abonnés aux offres</div><div class="num" id="crm_subs">—</div><div class="delta">reçoivent tes campagnes</div></div>
+      <div class="cell"><div class="lbl">Désinscrits</div><div class="num" id="crm_unsubs">—</div><div class="delta">ne plus contacter</div></div>
+      <div class="cell"><div class="lbl">Campagnes</div><div class="num" id="crm_camps">—</div><div class="delta">envoyées</div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+        <h3 style="margin:0">Ta base clients</h3>
+        <input id="crm_search" placeholder="Rechercher…" style="max-width:220px;font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)" oninput="crmFilter(this.value)">
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin:0 0 12px">
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--vert,#2E9E6B);vertical-align:middle;margin-right:4px"></span>Abonné aux offres</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#8C857A;vertical-align:middle;margin-right:4px"></span>Non abonné / désinscrit</span>
+      </div>
+      <div id="crm_list" style="overflow-x:auto"><div style="color:var(--muted);font-size:14px">Chargement…</div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h3 style="margin:0 0 12px">Historique des campagnes</h3>
+      <div id="crm_camplist"><div style="color:var(--muted);font-size:13.5px">Aucune campagne envoyée pour le moment.</div></div>
     </div>
   </section>
 
@@ -1098,6 +1125,42 @@
   </div>
 </div>
 
+<div id="campaignModal" style="display:none;position:fixed;inset:0;z-index:59;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px">
+  <div class="m" style="background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:560px;max-width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+      <div><div class="eyebrow" style="margin:0 0 4px">Email marketing</div><div class="disp" style="font-size:23px;font-weight:600">Nouvelle campagne</div></div>
+      <span onclick="document.getElementById('campaignModal').style.display='none'" style="cursor:pointer;color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--line);font-size:15px;flex-shrink:0">✕</span>
+    </div>
+    <div class="cstep"><span class="cnum">1</span><span>Ton message</span></div>
+    <div class="hassist">
+      <div class="ha-top"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3FxlYgJDKCfLhRlFGA4Qt4ekYXA/hf_20260725_101724_148b0ef5-4ee0-4705-a3d9-1dfe4b019efa.png" alt="Hospi"><div><b>Laisse Hospi rédiger ta campagne</b><small>Décris ton offre ou ton actualité en 1-2 phrases : Hospi écrit l'objet, le titre et le texte avec ta voix et ton branding.</small></div></div>
+      <textarea id="cmBrief" rows="2" placeholder="Ex : -20% sur la pose gel cette semaine pour remplir les créneaux calmes du mardi et mercredi."></textarea>
+      <button class="btn gen sm" style="margin-top:8px" onclick="campaignHospi()">✦ Hospi rédige la campagne</button>
+    </div>
+    <div class="field" style="margin:12px 0 0"><label>Objet de l'email</label><input id="cmSubject" placeholder="Ex : Une attention pour toi cette semaine ✨"></div>
+    <div class="field" style="margin:12px 0 0"><label>Titre (dans l'email)</label><input id="cmTitle" placeholder="Ex : -20% sur ta prochaine pose"></div>
+    <div class="field" style="margin:12px 0 18px"><label>Message</label><textarea id="cmMessage" rows="5" placeholder="Écris ton message ici… ou laisse Hospi le rédiger ✦"></textarea></div>
+    <div class="cstep"><span class="cnum">2</span><span>Image (optionnel)</span></div>
+    <div class="field" style="margin-bottom:18px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <label class="btn ghost sm" style="cursor:pointer">📷 Depuis ma galerie<input type="file" accept="image/*" style="display:none" onchange="campaignImg(event)"></label>
+        <button class="btn ghost sm" onclick="campaignBanque()">🖼️ Depuis la banque</button>
+        <button class="btn ghost sm" id="cmImgClear" style="display:none" onclick="campaignImgClear()">✕ Retirer l'image</button>
+      </div>
+      <div id="cmImgPrev"></div>
+      <div id="cmBanquePick" style="display:none;gap:8px;flex-wrap:wrap;margin-top:10px;max-height:150px;overflow:auto"></div>
+    </div>
+    <div class="cstep"><span class="cnum">3</span><span>Bouton (optionnel)</span></div>
+    <div style="display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+      <div class="field" style="flex:1;min-width:150px;margin:0"><label>Texte du bouton</label><input id="cmCtaText" placeholder="Prendre rendez-vous"></div>
+      <div class="field" style="flex:1;min-width:150px;margin:0"><label>Lien du bouton</label><input id="cmCtaUrl" placeholder="https://…"></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);background:rgba(196,162,101,.10);border:1px solid rgba(196,162,101,.28);border-radius:12px;padding:11px 13px;margin:14px 0 16px">🔒 Le lien de désinscription et la signature .HOSPIRE sont ajoutés automatiquement à chaque email (conformité RGPD).</div>
+    <div id="cmRes" style="font-size:13px;margin:0 0 12px;color:var(--muted)"></div>
+    <div style="display:flex;gap:10px;border-top:1px solid var(--line);padding-top:16px"><button class="btn ghost" style="flex:1" onclick="campaignTest()">M'envoyer un test</button><button class="btn gold" style="flex:1.3" id="cmSend" onclick="campaignSend()">Envoyer à mes clients</button></div>
+  </div>
+</div>
+
 <div id="schedModal" style="display:none;position:fixed;inset:0;z-index:58;background:rgba(26,21,16,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px">
   <div class="m" style="background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:26px;width:440px;max-width:100%;box-shadow:var(--shadow-lg)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div class="disp" style="font-size:22px;font-weight:600">Post programmé</div><span onclick="document.getElementById('schedModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
@@ -1114,6 +1177,7 @@ document.getElementById('menu').addEventListener('click',e=>{const a=e.target.cl
   if(a.dataset.sec==='contenu'&&window.loadPlanning)window.loadPlanning();
   if(a.dataset.sec==='branding'&&window.loadProfile)window.loadProfile();
   if(a.dataset.sec==='bilan'&&window.loadBilanExtra)window.loadBilanExtra();
+  if(a.dataset.sec==='crm'&&window.loadCrm)window.loadCrm();
   if(a.dataset.sec==='clients'&&window.loadClientsAdmin)window.loadClientsAdmin();});
 document.querySelectorAll('.subnav').forEach(function(sn){ sn.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
   sn.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
@@ -1544,6 +1608,14 @@ function chartAccent(){var b=document.body.classList.contains('beauty');return b
 /* Vocabulaire Beauté (FR) : remplace les termes resto par des termes beauté.
    Ciblé (nœud entier exact + phrases uniques) pour ne pas casser l'i18n EN/ES. */
 var BEAUTY_EXACT={
+  "Mes clients":"Mes clientes",
+  "Ta base clients":"Ta base clientes",
+  "Abonnés aux offres":"Abonnées aux offres",
+  "Désinscrits":"Désinscrites",
+  "Abonné aux offres":"Abonnée aux offres",
+  "Non abonné / désinscrit":"Non abonnée / désinscrite",
+  "Aucun client pour le moment. Ils apparaîtront ici dès leurs premières réservations en ligne.":"Aucune cliente pour le moment. Elles apparaîtront ici dès leurs premières réservations en ligne.",
+  "Connecte-toi pour voir tes clients.":"Connecte-toi pour voir tes clientes.",
   "Réservations · 30 derniers jours":"Rendez-vous · 30 derniers jours",
   "Réservations du mois":"Rendez-vous du mois",
   "Couverts servis":"Rendez-vous honorés",
@@ -2205,6 +2277,186 @@ window.downloadReport=function(){
     }
   }catch(e){}
   setTimeout(function(){window.print();},500);
+};
+/* ===== Mes clients : CRM + Email marketing ===== */
+window.__crmRows=[]; window.__crmCampImg=''; window.__crmSubs=0;
+window.loadCrm=async function(){
+  var list=document.getElementById('crm_list');if(!list)return;
+  if(typeof sb==='undefined'||!sb||!window.currentBlog){list.innerHTML='<div style="color:var(--muted);font-size:14px">Connecte-toi pour voir tes clients.</div>';return;}
+  list.innerHTML='<div style="color:var(--muted);font-size:14px">Chargement…</div>';
+  var blog=String(window.currentBlog);
+  async function readAll(){
+    var res=await sb.from('reservations').select('email,name,date_time,marketing_consent').eq('blog_id',blog).not('email','is',null);
+    var un=await sb.from('marketing_unsubs').select('email').eq('blog_id',blog);
+    var cp=await sb.from('campaigns').select('subject,sent_count,created_at').eq('blog_id',blog).order('created_at',{ascending:false});
+    return {res:res,un:un,cp:cp};
+  }
+  var d;try{d=await readAll();}catch(e){d={};}
+  if(((d.res&&d.res.error)||!d.res||!d.res.data||!d.res.data.length)&&!window.__crmRetried){window.__crmRetried=true;try{await sb.auth.refreshSession();}catch(e){}try{d=await readAll();}catch(e){}}
+  var rows=(d.res&&d.res.data)||[];
+  var unsub={};((d.un&&d.un.data)||[]).forEach(function(x){var e=String(x.email||'').trim().toLowerCase();if(e)unsub[e]=1;});
+  var camps=(d.cp&&d.cp.data)||[];
+  var map={};
+  rows.forEach(function(r){
+    var e=String(r.email||'').trim().toLowerCase();if(!e||e.indexOf('@')<0)return;
+    if(!map[e])map[e]={email:e,name:r.name||'',count:0,last:null,consent:false};
+    map[e].count++;
+    var t=r.date_time?new Date(r.date_time).getTime():0;
+    if(t&&(!map[e].last||t>map[e].last)){map[e].last=t;if(r.name)map[e].name=r.name;}
+    if(r.marketing_consent===true)map[e].consent=true;
+  });
+  var arr=Object.keys(map).map(function(k){return map[k];});
+  arr.forEach(function(c){c.unsub=!!unsub[c.email];c.subscribed=c.consent&&!c.unsub;});
+  arr.sort(function(a,b){return (b.last||0)-(a.last||0);});
+  window.__crmRows=arr;
+  var subs=arr.filter(function(c){return c.subscribed;}).length;
+  var uns=arr.filter(function(c){return c.unsub;}).length;
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('crm_total',arr.length);set('crm_subs',subs);set('crm_unsubs',uns);set('crm_camps',camps.length);
+  window.__crmSubs=subs;
+  var word=document.body.classList.contains('beauty')?'clientes':'clients';
+  var sbtn=document.getElementById('cmSend');if(sbtn)sbtn.textContent='Envoyer à '+subs+' '+word;
+  renderCrmTable(arr);
+  var cl=document.getElementById('crm_camplist');
+  if(cl){
+    if(!camps.length)cl.innerHTML='<div style="color:var(--muted);font-size:13.5px">Aucune campagne envoyée pour le moment.</div>';
+    else cl.innerHTML=camps.map(function(c){var dt=c.created_at?new Date(c.created_at).toLocaleDateString((window.__loc||'fr-FR'),{day:'numeric',month:'short',year:'numeric'}):'';return '<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span>'+_esc(c.subject||'(sans objet)')+'</span><span style="color:var(--muted);white-space:nowrap">'+(c.sent_count||0)+' · '+dt+'</span></div>';}).join('');
+  }
+};
+function renderCrmTable(arr){
+  var box=document.getElementById('crm_list');if(!box)return;
+  if(!arr.length){box.innerHTML='<div style="color:var(--muted);font-size:14px">Aucun client pour le moment. Ils apparaîtront ici dès leurs premières réservations en ligne.</div>';return;}
+  var h='<table style="width:100%;border-collapse:collapse;font-size:13.5px"><thead><tr style="text-align:left;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase">'
+    +'<th style="padding:8px 10px 8px 0;font-weight:600">Nom</th><th style="padding:8px 10px;font-weight:600">Email</th><th style="padding:8px 10px;font-weight:600;text-align:center">Rendez-vous</th><th style="padding:8px 10px;font-weight:600">Dernier</th><th style="padding:8px 0 8px 10px;font-weight:600;text-align:center">Offres</th></tr></thead><tbody>';
+  arr.forEach(function(c){
+    var last=c.last?new Date(c.last).toLocaleDateString((window.__loc||'fr-FR'),{day:'numeric',month:'short',year:'numeric'}):'—';
+    var badge=c.subscribed?'<span style="color:var(--vert,#2E9E6B);font-weight:700">✓</span>':'<span style="color:#8C857A"'+(c.unsub?' title="Désinscrit"':'')+'>✕</span>';
+    h+='<tr style="border-top:1px solid var(--line)"><td style="padding:9px 10px 9px 0">'+_esc(c.name||'—')+'</td><td style="padding:9px 10px;color:var(--muted)">'+_esc(c.email)+'</td><td style="padding:9px 10px;text-align:center">'+c.count+'</td><td style="padding:9px 10px;color:var(--muted);white-space:nowrap">'+last+'</td><td style="padding:9px 0 9px 10px;text-align:center">'+badge+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+  if(document.body.classList.contains('beauty')&&window.applyBeautyTerms)applyBeautyTerms();
+}
+window.crmFilter=function(q){
+  q=(q||'').trim().toLowerCase();
+  var arr=window.__crmRows||[];
+  renderCrmTable(!q?arr:arr.filter(function(c){return (c.name||'').toLowerCase().indexOf(q)>=0||(c.email||'').indexOf(q)>=0;}));
+};
+/* ---- Nouvelle campagne (email marketing) ---- */
+window.openCampaign=function(){
+  if(!window.currentBlog){alert('Aucune marque active.');return;}
+  window.__crmCampImg='';
+  ['cmBrief','cmSubject','cmTitle','cmMessage','cmCtaText','cmCtaUrl'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  var pv=document.getElementById('cmImgPrev');if(pv)pv.innerHTML='';
+  var ic=document.getElementById('cmImgClear');if(ic)ic.style.display='none';
+  var bp=document.getElementById('cmBanquePick');if(bp){bp.style.display='none';bp.innerHTML='';}
+  var rs=document.getElementById('cmRes');if(rs)rs.textContent='';
+  document.getElementById('campaignModal').style.display='flex';
+};
+window.campaignHospi=async function(){
+  var res=document.getElementById('cmRes');
+  var brief=(document.getElementById('cmBrief').value||'').trim();
+  if(!brief){res.style.color='#b07d1e';res.innerHTML='✦ <b>Hospi :</b> décris ton offre ou ton actualité ci-dessus, et je rédige l\'email pour toi.';document.getElementById('cmBrief').focus();return;}
+  var brand=document.getElementById('brandTitle')?document.getElementById('brandTitle').textContent:'l\'institut';
+  res.style.color='var(--muted)';res.textContent='Hospi rédige ta campagne…';
+  var prompt="Rédige un email marketing court et chaleureux pour la clientèle de cet établissement, à partir de ce contexte : \""+brief+"\". Réponds EXACTEMENT dans ce format, sans aucun autre texte :\nOBJET: (ligne d'objet courte et engageante, 0 ou 1 emoji)\nTITRE: (titre court affiché en haut de l'email)\nTEXTE: (2 à 4 phrases, ton proche et humain, invitant à prendre rendez-vous ; sans lien ni signature)";
+  try{
+    var r=await fetch('/api/hospi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vertical:(document.body.classList.contains('beauty')?'beauty':'resto'),mode:'chat',message:prompt,brand:brand,profile:window.__brandProfile||{},lang:(window.__lang||'fr')})});
+    var j=await r.json();
+    if(j.needsKey){res.style.color='#b07d1e';res.textContent="Hospi n'est pas encore activée (clé API).";return;}
+    if(j.error){res.style.color='var(--rouge)';res.textContent='Erreur : '+j.error;return;}
+    var txt=j.text||'';
+    var mo=txt.match(/OBJET\s*:\s*(.+)/i),mt=txt.match(/TITRE\s*:\s*(.+)/i),mx=txt.match(/TEXTE\s*:\s*([\s\S]+)/i);
+    if(mo)document.getElementById('cmSubject').value=mo[1].trim();
+    if(mt)document.getElementById('cmTitle').value=mt[1].trim();
+    if(mx)document.getElementById('cmMessage').value=mx[1].replace(/\n(OBJET|TITRE)\s*:.*/is,'').trim();
+    if(!mo&&!mx)document.getElementById('cmMessage').value=txt.trim();
+    res.style.color='var(--vert)';res.textContent='✓ Hospi a rédigé ta campagne — ajuste-la si besoin.';
+  }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur : '+e;}
+};
+window.campaignImg=function(e){
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  if(typeof sb==='undefined'||!sb){alert('Stockage indisponible');return;}
+  var res=document.getElementById('cmRes');res.style.color='var(--muted)';res.textContent='Envoi de l\'image…';
+  var path=(window.currentBlog||'x')+'/campaign-'+Date.now()+'-'+String(f.name||'img').replace(/[^a-zA-Z0-9.\-_]/g,'_');
+  sb.storage.from('media').upload(path,f,{contentType:f.type||undefined}).then(function(r){
+    if(r.error){res.style.color='var(--rouge)';res.textContent='Erreur image : '+r.error.message;return;}
+    var pub=sb.storage.from('media').getPublicUrl(path).data.publicUrl;
+    _campaignSetImg(pub);res.textContent='';
+  });
+};
+function _campaignSetImg(url){
+  window.__crmCampImg=url;
+  var pv=document.getElementById('cmImgPrev');if(pv)pv.innerHTML='<img src="'+_esc(url)+'" style="max-width:180px;border-radius:12px;display:block">';
+  var ic=document.getElementById('cmImgClear');if(ic)ic.style.display='';
+  var bp=document.getElementById('cmBanquePick');if(bp)bp.style.display='none';
+}
+window.campaignImgClear=function(){window.__crmCampImg='';var pv=document.getElementById('cmImgPrev');if(pv)pv.innerHTML='';var ic=document.getElementById('cmImgClear');if(ic)ic.style.display='none';};
+window.campaignBanque=async function(){
+  var box=document.getElementById('cmBanquePick');if(!box)return;
+  if(typeof sb==='undefined'||!sb){box.style.display='flex';box.textContent='Stockage indisponible';return;}
+  box.style.display='flex';box.innerHTML='Chargement…';
+  var pfx=(window.currentBlog||'x');
+  var r=await sb.storage.from('media').list(pfx,{limit:60,sortBy:{column:'created_at',order:'desc'}});
+  var items=(r.data||[]).filter(function(o){return o.name!=='.emptyFolderPlaceholder'&&!/\.(mp4|mov|webm|m4v)$/i.test(o.name);});
+  if(!items.length){box.innerHTML='<div style="font-size:12.5px;color:var(--muted)">Ta banque est vide. Ajoute des photos depuis « Contenu → Banque de contenus ».</div>';return;}
+  box.innerHTML='';
+  items.forEach(function(o){
+    var pub=sb.storage.from('media').getPublicUrl(pfx+'/'+o.name).data.publicUrl;
+    var tile=document.createElement('div');tile.title='Choisir';tile.style.cssText='width:60px;height:60px;border-radius:10px;overflow:hidden;cursor:pointer';tile.innerHTML='<img src="'+_esc(pub)+'" style="width:100%;height:100%;object-fit:cover">';
+    tile.onclick=function(){_campaignSetImg(pub);};
+    box.appendChild(tile);
+  });
+};
+async function _campaignPayload(extra){
+  var tok=await adminToken();
+  var brand=document.getElementById('brandTitle')?document.getElementById('brandTitle').textContent:'';
+  var cfg=window.__resaCfg||{};
+  return Object.assign({
+    token:tok, blogId:String(window.currentBlog||''),
+    subject:(document.getElementById('cmSubject').value||'').trim(),
+    title:(document.getElementById('cmTitle').value||'').trim(),
+    message:(document.getElementById('cmMessage').value||'').trim(),
+    imageUrl:window.__crmCampImg||'',
+    ctaText:(document.getElementById('cmCtaText').value||'').trim(),
+    ctaUrl:(document.getElementById('cmCtaUrl').value||'').trim(),
+    brandName:brand, phone:cfg.phone||'', replyTo:cfg.email||''
+  },extra||{});
+}
+window.campaignTest=async function(){
+  var res=document.getElementById('cmRes');
+  var subject=(document.getElementById('cmSubject').value||'').trim(),message=(document.getElementById('cmMessage').value||'').trim();
+  if(!subject||!message){res.style.color='var(--rouge)';res.textContent='Ajoute au moins un objet et un message.';return;}
+  var s=await sb.auth.getSession();var myEmail=(s.data&&s.data.session&&s.data.session.user&&s.data.session.user.email)||'';
+  if(!myEmail){res.style.color='var(--rouge)';res.textContent='Session sans email — reconnecte-toi.';return;}
+  res.style.color='var(--muted)';res.textContent='Envoi du test à '+myEmail+'…';
+  try{
+    var payload=await _campaignPayload({test:myEmail});
+    var r=await fetch('/api/campaign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    var j=await r.json();
+    if(!r.ok||!j.ok){res.style.color='var(--rouge)';res.textContent='Erreur : '+(j.error||'envoi impossible');return;}
+    res.style.color='var(--vert)';res.textContent='✓ Test envoyé à '+myEmail+'. Vérifie ta boîte (et les spams).';
+  }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur : '+e;}
+};
+window.campaignSend=async function(){
+  var res=document.getElementById('cmRes');
+  var subject=(document.getElementById('cmSubject').value||'').trim(),message=(document.getElementById('cmMessage').value||'').trim();
+  if(!subject||!message){res.style.color='var(--rouge)';res.textContent='Ajoute au moins un objet et un message.';return;}
+  var n=window.__crmSubs||0;
+  var word=document.body.classList.contains('beauty')?'clientes':'clients';
+  if(!n){res.style.color='var(--rouge)';res.textContent='Aucun client abonné aux offres pour le moment.';return;}
+  if(!confirm('Envoyer cette campagne à '+n+' '+word+' abonné·es ? Chaque email inclut un lien de désinscription.'))return;
+  var btn=document.getElementById('cmSend');btn.disabled=true;var old=btn.textContent;btn.textContent='Envoi en cours…';
+  res.style.color='var(--muted)';res.textContent='Envoi en cours… (ne ferme pas cette fenêtre)';
+  try{
+    var payload=await _campaignPayload({});
+    var r=await fetch('/api/campaign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    var j=await r.json();
+    if(!r.ok||!j.ok){btn.disabled=false;btn.textContent=old;res.style.color='var(--rouge)';res.textContent='Erreur : '+(j.error||'envoi impossible');return;}
+    res.style.color='var(--vert)';res.textContent='✓ Campagne envoyée à '+(j.sent||0)+' '+word+((j.failed)?(' ('+j.failed+' échecs)'):'')+'.';
+    btn.disabled=false;btn.textContent=old;
+    setTimeout(function(){document.getElementById('campaignModal').style.display='none';if(window.loadCrm)window.loadCrm();},1600);
+  }catch(e){btn.disabled=false;btn.textContent=old;res.style.color='var(--rouge)';res.textContent='Erreur : '+e;}
 };
 /* ---- Réservations réelles (Supabase) ---- */
 var __resaOff=0, __resaCache=[], __resaId=null;
@@ -3095,6 +3347,46 @@ window.saveSite=async function(){
 (function(){
   /* clé FR : [EN, ES]. Les noms propres/marques (Instagram, Google, .HOSPIRE, Hospi…) restent identiques (absents = non traduits). */
   var T={
+"Mes clients":["My clients","Mis clientes"],
+"à toi":["yours","tuya"],
+"ta base email · marketing sans commission":["your email base · commission-free marketing","tu base de emails · marketing sin comisión"],
+"emails uniques":["unique emails","emails únicos"],
+"Abonnés aux offres":["Subscribed to offers","Suscritos a ofertas"],
+"reçoivent tes campagnes":["receive your campaigns","reciben tus campañas"],
+"Désinscrits":["Unsubscribed","Dados de baja"],
+"ne plus contacter":["do not contact","no contactar"],
+"Campagnes":["Campaigns","Campañas"],
+"envoyées":["sent","enviadas"],
+"Ta base clients":["Your client base","Tu base de clientes"],
+"Rechercher…":["Search…","Buscar…"],
+"Abonné aux offres":["Subscribed to offers","Suscrito a ofertas"],
+"Non abonné / désinscrit":["Not subscribed / unsubscribed","No suscrito / dado de baja"],
+"Historique des campagnes":["Campaign history","Historial de campañas"],
+"Aucune campagne envoyée pour le moment.":["No campaign sent yet.","Aún no se ha enviado ninguna campaña."],
+"Aucun client pour le moment. Ils apparaîtront ici dès leurs premières réservations en ligne.":["No clients yet. They'll appear here after their first online bookings.","Aún no hay clientes. Aparecerán aquí tras sus primeras reservas online."],
+"Nom":["Name","Nombre"],
+"Email":["Email","Email"],
+"Rendez-vous":["Appointments","Citas"],
+"Dernier":["Last","Último"],
+"Offres":["Offers","Ofertas"],
+"Nouvelle campagne":["New campaign","Nueva campaña"],
+"Email marketing":["Email marketing","Email marketing"],
+"Ton message":["Your message","Tu mensaje"],
+"Laisse Hospi rédiger ta campagne":["Let Hospi write your campaign","Deja que Hospi redacte tu campaña"],
+"Décris ton offre ou ton actualité en 1-2 phrases : Hospi écrit l'objet, le titre et le texte avec ta voix et ton branding.":["Describe your offer or news in 1-2 sentences: Hospi writes the subject, title and text in your voice and branding.","Describe tu oferta o novedad en 1-2 frases: Hospi escribe el asunto, el título y el texto con tu voz y tu branding."],
+"✦ Hospi rédige la campagne":["✦ Hospi writes the campaign","✦ Hospi redacta la campaña"],
+"Objet de l'email":["Email subject","Asunto del email"],
+"Titre (dans l'email)":["Title (in the email)","Título (en el email)"],
+"Message":["Message","Mensaje"],
+"Image (optionnel)":["Image (optional)","Imagen (opcional)"],
+"✕ Retirer l'image":["✕ Remove image","✕ Quitar imagen"],
+"Bouton (optionnel)":["Button (optional)","Botón (opcional)"],
+"Texte du bouton":["Button text","Texto del botón"],
+"Lien du bouton":["Button link","Enlace del botón"],
+"🔒 Le lien de désinscription et la signature .HOSPIRE sont ajoutés automatiquement à chaque email (conformité RGPD).":["🔒 The unsubscribe link and the .HOSPIRE signature are added automatically to every email (GDPR compliant).","🔒 El enlace de baja y la firma .HOSPIRE se añaden automáticamente a cada email (cumplimiento RGPD)."],
+"M'envoyer un test":["Send me a test","Enviarme una prueba"],
+"Envoyer à mes clients":["Send to my clients","Enviar a mis clientes"],
+"Connecte-toi pour voir tes clients.":["Log in to see your clients.","Inicia sesión para ver tus clientes."],
 "Le cockpit digital de votre établissement.":["Your establishment's digital cockpit.","El cockpit digital de tu establecimiento."],
 "Adresse e-mail":["Email address","Correo electrónico"],
 "Mot de passe":["Password","Contraseña"],

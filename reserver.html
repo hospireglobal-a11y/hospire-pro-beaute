@@ -102,6 +102,7 @@
     <div class="field" id="fieldAllergens"><label>Allergènes / régime</label><input id="f_allergens" placeholder="Fruits à coque, sans gluten…"></div>
     <div class="field"><label>Message (optionnel)</label><textarea id="f_notes" rows="2" placeholder="Occasion, chaise bébé…"></textarea></div>
     <label class="consent"><input type="checkbox" id="f_consent"><span>J'accepte que mes données soient utilisées pour gérer ma réservation, conformément à la politique de confidentialité de l'établissement.</span></label>
+    <label class="consent"><input type="checkbox" id="f_mkt" checked><span>Je souhaite recevoir par email les offres et actualités de l'institut (désinscription en un clic).</span></label>
     <div class="err hide" id="err2"></div>
     <div class="row">
       <button class="btn ghost" style="flex:0 0 40%" id="back2">← Retour</button>
@@ -138,6 +139,7 @@
     <div class="field"><label>Allergènes / régime</label><input id="g_allergens" placeholder="Fruits à coque, sans gluten…"></div>
     <div class="field"><label>Message (occasion, besoins…)</label><textarea id="g_notes" rows="2" placeholder="Anniversaire, repas d'entreprise, gâteau…"></textarea></div>
     <label class="consent"><input type="checkbox" id="g_consent"><span>J'accepte que mes données soient utilisées pour gérer ma demande, conformément à la politique de confidentialité de l'établissement.</span></label>
+    <label class="consent"><input type="checkbox" id="g_mkt" checked><span>Je souhaite recevoir par email les offres et actualités de l'institut (désinscription en un clic).</span></label>
     <div class="err hide" id="g_err"></div>
     <button class="btn gold" id="g_submit">Envoyer la demande</button>
   </div>
@@ -328,13 +330,14 @@ $('submit').onclick=async function(){
   if(!$('f_consent').checked){return fail("Merci d'accepter l'utilisation de tes données.");}
   var btn=$('submit');btn.disabled=true;btn.textContent='Réservation…';
   try{
+    var mkt=!!($('f_mkt')&&$('f_mkt').checked);
     var payload=BEAUTY?{
       blogId:BLOG,date:sel.date,time:sel.time,dur:sel.dur,service:sel.service,staffId:sel.staffId,
-      name:name,phone:phone,email:email,notes:[allergens,notes].filter(Boolean).join(' · '),consent:true,
+      name:name,phone:phone,email:email,notes:[allergens,notes].filter(Boolean).join(' · '),consent:true,marketing:mkt,
       brandName:NAME,replyTo:REPLYTO
     }:{
       blogId:BLOG,date:sel.date,time:sel.time,party:sel.party,children:children,
-      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,
+      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,marketing:mkt,
       brandName:NAME,replyTo:REPLYTO
     };
     var r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -397,7 +400,7 @@ $('g_submit').onclick=async function(){
   try{
     var r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       group:true,blogId:BLOG,date:gsel.date,time:gsel.time,party:gsel.party,
-      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,brandName:NAME
+      name:name,phone:phone,email:email,allergens:allergens,notes:notes,consent:true,marketing:!!($('g_mkt')&&$('g_mkt').checked),brandName:NAME
     })});
     var j=await r.json();
     if(!r.ok){btn.disabled=false;btn.textContent='Envoyer la demande';return gfail(j.error||"Impossible d'envoyer la demande. Réessaie.");}
