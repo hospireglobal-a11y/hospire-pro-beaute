@@ -13,24 +13,32 @@ function json(res, code, obj) { res.status(code).setHeader("Content-Type", "appl
 
 function emailHtml(o) {
   // o: {brandName, title, message, imageUrl, ctaText, ctaUrl, unsubUrl, phone, address}
-  var img = o.imageUrl ? '<tr><td style="padding:0 0 22px"><img src="' + esc(o.imageUrl) + '" alt="" style="display:block;width:100%;max-width:560px;border-radius:14px"></td></tr>' : "";
-  var cta = (o.ctaUrl && o.ctaText) ? '<tr><td align="center" style="padding:6px 0 26px"><a href="' + esc(o.ctaUrl) + '" style="background:#C4A265;color:#1A1510;text-decoration:none;font-weight:700;font-size:15px;padding:13px 30px;border-radius:100px;display:inline-block">' + esc(o.ctaText) + '</a></td></tr>' : "";
-  var info = [o.address ? esc(o.address) : "", o.phone ? esc(o.phone) : ""].filter(Boolean).join(" · ");
-  return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:28px 12px"><tr><td align="center">' +
+  // Palette Beauté : crème #F5F0E8 · rose #E88FA8/#D97E97 · rose foncé #B5567F · doré #C4A265 · encre #1A1A1A
+  var img = o.imageUrl ? '<tr><td style="padding:0 0 24px"><img src="' + esc(o.imageUrl) + '" alt="" style="display:block;width:100%;max-width:552px;border-radius:16px"></td></tr>' : "";
+  var cta = (o.ctaUrl && o.ctaText) ? '<tr><td align="center" style="padding:8px 0 6px"><a href="' + esc(o.ctaUrl) + '" style="background:#E88FA8;background:linear-gradient(135deg,#E88FA8 0%,#D97E97 100%);color:#FFFFFF;text-decoration:none;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:.3px;padding:15px 38px;border-radius:100px;display:inline-block;box-shadow:0 8px 20px rgba(216,126,151,.32)">' + esc(o.ctaText) + '</a></td></tr>' : "";
+  var info = [o.address ? esc(o.address) : "", o.phone ? esc(o.phone) : ""].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;");
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>' +
+    '<body style="margin:0;padding:0;background:#F5F0E8">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 12px"><tr><td align="center">' +
     '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">' +
-    '<tr><td align="center" style="padding:0 0 18px;font-family:Georgia,serif;font-size:24px;font-weight:700;color:#1A1510">' + esc(o.brandName) + '</td></tr>' +
-    '<tr><td style="background:#FFFFFF;border-radius:18px;padding:30px 28px">' +
+    // En-tête marque : petit trait rosé + nom en serif
+    '<tr><td align="center" style="padding:4px 0 6px"><div style="width:38px;height:3px;border-radius:3px;background:#E88FA8;margin:0 auto"></div></td></tr>' +
+    '<tr><td align="center" style="padding:0 0 4px;font-family:Georgia,\'Times New Roman\',serif;font-size:25px;font-weight:700;letter-spacing:.4px;color:#1A1A1A">' + esc(o.brandName) + '</td></tr>' +
+    '<tr><td align="center" style="padding:0 0 20px;font-family:Georgia,serif;font-size:12px;font-style:italic;letter-spacing:2px;text-transform:uppercase;color:#C4A265">Beauté &amp; soin</td></tr>' +
+    // Carte
+    '<tr><td style="background:#FFFFFF;border-radius:22px;padding:34px 32px;box-shadow:0 14px 40px rgba(181,86,127,.10)">' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' +
     img +
-    (o.title ? '<tr><td style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#1A1510;padding:0 0 12px">' + esc(o.title) + '</td></tr>' : "") +
-    '<tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#3d372f;padding:0 0 22px">' + nl2br(o.message) + '</td></tr>' +
+    (o.title ? '<tr><td align="center" style="font-family:Georgia,\'Times New Roman\',serif;font-size:23px;font-weight:700;line-height:1.35;color:#B5567F;padding:0 0 10px">' + esc(o.title) + '</td></tr>' +
+      '<tr><td align="center" style="padding:0 0 20px"><div style="width:32px;height:2px;border-radius:2px;background:#EBC9D4;margin:0 auto"></div></td></tr>' : "") +
+    '<tr><td style="font-family:Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.72;color:#4A4038;padding:0 0 26px;text-align:center">' + nl2br(o.message) + '</td></tr>' +
     cta +
-    (info ? '<tr><td align="center" style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8C857A;border-top:1px solid #EAE4D9;padding:16px 0 0">' + info + '</td></tr>' : "") +
+    (info ? '<tr><td align="center" style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#A79C90;border-top:1px solid #F0E6DC;padding:22px 0 2px;margin-top:8px">' + info + '</td></tr>' : "") +
     '</table></td></tr>' +
-    '<tr><td align="center" style="padding:20px 10px;font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#8C857A;line-height:1.7">' +
-    'Envoyé avec ♥ par ' + esc(o.brandName) + ' via <a href="https://hospireclub.com" style="color:#C4A265;font-weight:700;text-decoration:none">.HOSPIRE&nbsp;PRO</a><br>' +
-    '<a href="' + esc(o.unsubUrl) + '" style="color:#8C857A;text-decoration:underline">Se désinscrire de ces emails</a>' +
+    // Pied
+    '<tr><td align="center" style="padding:24px 10px 4px;font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#A79C90;line-height:1.8">' +
+    'Envoyé avec <span style="color:#E88FA8">&#10084;</span> par ' + esc(o.brandName) + ' &middot; <a href="https://hospireclub.com" style="color:#C4A265;font-weight:700;text-decoration:none">.HOSPIRE&nbsp;PRO</a><br>' +
+    '<a href="' + esc(o.unsubUrl) + '" style="color:#A79C90;text-decoration:underline">Se désinscrire de ces emails</a>' +
     '</td></tr></table></td></tr></table></body></html>';
 }
 
@@ -56,10 +64,12 @@ module.exports = async function handler(req, res) {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     const page = function (msg) {
       return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Désinscription</title></head>' +
-        '<body style="margin:0;background:#F5F0E8;font-family:Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh">' +
-        '<div style="background:#fff;border-radius:18px;padding:38px 34px;max-width:420px;text-align:center;box-shadow:0 10px 40px rgba(26,21,16,.08)">' +
-        '<div style="font-size:34px;margin-bottom:12px">✉️</div><div style="font-size:16px;line-height:1.6;color:#1A1510">' + msg + '</div>' +
-        '<div style="margin-top:18px;font-size:11px;color:#8C857A">.HOSPIRE PRO</div></div></body></html>';
+        '<body style="margin:0;background:#F5F0E8;font-family:Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px">' +
+        '<div style="background:#fff;border-radius:24px;padding:42px 36px;max-width:430px;text-align:center;box-shadow:0 16px 46px rgba(181,86,127,.12)">' +
+        '<div style="width:44px;height:3px;border-radius:3px;background:#E88FA8;margin:0 auto 20px"></div>' +
+        '<div style="font-size:34px;margin-bottom:14px">💌</div>' +
+        '<div style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:1.65;color:#4A4038">' + msg + '</div>' +
+        '<div style="margin-top:22px;font-family:Georgia,serif;font-size:11px;letter-spacing:1px;color:#C4A265">.HOSPIRE PRO</div></div></body></html>';
     };
     if (!blogId || !email || !SECRET || t !== sign(SECRET, blogId, email)) return res.status(400).send(page("Lien de désinscription invalide ou expiré."));
     try {
