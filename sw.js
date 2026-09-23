@@ -1,5 +1,5 @@
 /* .HOSPIRE PRO — Service Worker (app installable, PWA) */
-const CACHE = 'hospire-pro-v1';
+const CACHE = 'hospire-pro-v2';
 const ASSETS = [
   '/', '/index.html', '/manifest.json',
   '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png',
@@ -22,14 +22,18 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   const req = e.request;
   const url = new URL(req.url);
-  // Ne jamais intercepter l'API ni les requêtes non-GET
-  if (req.method !== 'GET' || url.pathname.indexOf('/api/') === 0) return;
+  if (req.method !== 'GET') return;
+  // IMPORTANT : ne jamais mettre en cache les données dynamiques.
+  // - Cross-origin (Supabase, Resend, etc.) → réseau direct, sinon on servirait des réservations périmées.
+  // - /api/ (nos fonctions serverless) → réseau direct.
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.indexOf('/api/') === 0) return;
   // Navigation : toujours la version la plus récente (réseau), repli sur le cache hors-ligne
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).catch(function () { return caches.match('/index.html'); }));
     return;
   }
-  // Statique : cache d'abord, sinon réseau (puis mise en cache)
+  // Statique same-origin uniquement : cache d'abord, sinon réseau (puis mise en cache)
   e.respondWith(
     caches.match(req).then(function (cached) {
       return cached || fetch(req).then(function (res) {
