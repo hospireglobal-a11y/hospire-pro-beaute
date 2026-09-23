@@ -1379,7 +1379,7 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
   function draw(s){var c=$('chart');if(!c)return;if(chart)chart.destroy();var ctx=c.getContext('2d');
     var _ac=chartAccent();var grad=ctx.createLinearGradient(0,0,0,250);grad.addColorStop(0,'rgba('+_ac.rgb+',.28)');grad.addColorStop(1,'rgba('+_ac.rgb+',0)');
     chart=new Chart(c,{type:'line',data:{labels:s.map(p=>dlab(p.x)),datasets:[{data:s.map(p=>p.y),borderColor:_ac.line,backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.05)'},border:{display:false}},x:{grid:{display:false},ticks:{maxTicksLimit:8}}}}});}
-  async function load(){if(!cur)return;window.currentBlog=cur;if(window.loadProfile)window.loadProfile();if(window.renderReferral)window.renderReferral();
+  async function load(){if(!cur)return;window.currentBlog=cur;if(window.loadResa)window.loadResa();if(window.startResaLive)window.startResaLive();if(window.loadProfile)window.loadProfile();if(window.renderReferral)window.renderReferral();
     var foll=await api('timeline',{blogId:cur,network:'instagram',subject:'account',metric:'followers',start:iso(30)+'T00:00:00',end:iso(0)+'T23:59:59'});
     var fv=(foll&&foll.data&&foll.data[0]&&foll.data[0].values)||[];
     var s=ser(fv).sort(function(a,b){return new Date(a.x)-new Date(b.x);});
@@ -1404,7 +1404,6 @@ window.adminBranding=async function(blogId){if(!blogId){alert("Ce client n'a pas
     if(window.renderReco)window.renderReco();
     loadAccountMetrics(cur);
     loadBestTimes(cur);
-    if(window.loadResa)window.loadResa();
     if(window.fillWidget)window.fillWidget();
     if(window.loadSite)window.loadSite();
     if(window.loadReviews)window.loadReviews();
@@ -2628,8 +2627,22 @@ function renderResaGrid(start,rows){
 }
 /* re-render au changement d'orientation/breakpoint (sans re-fetch) */
 (function(){var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){if(document.getElementById('rs_grid')&&__resaCache)try{renderResaGrid(_monday(__resaOff),__resaCache);}catch(e){}},200);});})();
-/* rafraîchit les couleurs (retard) pendant le service, sans re-fetch */
-setInterval(function(){var g=document.getElementById('rs_grid');if(g&&g.offsetParent!==null&&window.__resaCache&&window.__resaCache.length){try{renderResaGrid(_monday(__resaOff),__resaCache);}catch(e){}}},60000);
+/* Auto-refresco de reservas : re-consulta Supabase mientras el calendario está visible,
+   para que las citas nuevas (widget) aparezcan solas en ~15s sans recharger la page.
+   + re-fetch immédiat quand l'onglet redevient visible. */
+window.startResaLive=function(){
+  if(window.__resaLive)return;window.__resaLive=true;
+  var busy=false;
+  var tick=function(){
+    if(document.hidden)return;                          // pas quand l'onglet est en arrière-plan
+    if(!document.getElementById('rs_grid'))return;      // app chargée
+    if(busy||!window.currentBlog||typeof window.loadResa!=='function')return;
+    busy=true;Promise.resolve(window.loadResa()).catch(function(){}).then(function(){busy=false;});
+  };
+  setInterval(tick,15000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)tick();});
+  window.addEventListener('focus',tick);
+};
 window.openResaReal=function(id){
   var x=__resaCache.filter(function(r){return r.id===id;})[0];if(!x)return;__resaId=id;
   window.__resaContact={phone:x.phone||'',email:x.email||'',contact:x.contact||''};
