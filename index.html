@@ -1028,7 +1028,7 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" id="nr_title" style="font-size:22px;font-weight:600">Nouvelle réservation</div><span onclick="document.getElementById('newResaModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
   <div class="field"><label>Nom du client</label><input id="nr_name" placeholder="Fam. Bernard"></div>
   <div class="field"><label>Date et heure</label><input type="datetime-local" id="nr_dt"></div>
-  <div class="field" id="nrf_presta" style="display:none"><label>Prestation(s)</label><div id="nr_prestaList"></div><button type="button" id="nr_addPresta" class="btn ghost" style="width:100%;margin-top:2px;font-size:13px;padding:9px">+ Ajouter une prestation</button><div id="nr_prestaTotal" style="margin-top:6px;font-size:12.5px;color:var(--gold);font-weight:600"></div></div>
+  <div class="field" id="nrf_presta" style="display:none"><label>Prestation(s)</label><div id="nr_prestaList"></div><button type="button" id="nr_addPresta" class="btn ghost" style="width:100%;margin-top:2px;font-size:13px;padding:9px" onclick="_nrAddPrestaRow()">+ Ajouter une prestation</button><div id="nr_prestaTotal" style="margin-top:6px;font-size:12.5px;color:var(--gold);font-weight:600"></div></div>
   <div class="field" id="nrf_staff" style="display:none"><label>Avec qui ?</label><select id="nr_staff"></select></div>
   <div style="display:flex;gap:12px">
     <div class="field" id="nrf_adults" style="flex:1"><label>Adultes</label><input type="number" id="nr_adults" min="1" value="2"></div>
