@@ -2541,7 +2541,10 @@ async function _persistCfg(res){
   try{
     if(!window.__resaCfg)window.__resaCfg={};
     if(_isBeauty())window.__resaCfg.mode='beauty'; // ne JAMAIS perdre le mode en sauvant une absence (sinon la résa beauté casse)
-    await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()});return true;}
+    try{await sb.auth.refreshSession();}catch(e){}
+    var _up=await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()}).select();
+    if((_up&&_up.error)||!_up||!_up.data||!_up.data.length){if(res){res.style.color='var(--rouge)';res.textContent='Enregistrement refusé (session expirée ?). Déconnecte-toi et reconnecte-toi.';}return false;}
+    return true;}
   catch(e){if(res){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}return false;}
 }
 window.savePause=async function(){
@@ -3070,7 +3073,10 @@ window.saveResaConfig=async function(){
   if(_isBeauty())window.__resaCfg.mode='beauty';
   res.style.color='var(--muted)';res.textContent='Enregistrement…';
   try{
-    await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()});
+    try{await sb.auth.refreshSession();}catch(e){} // renouvelle le token avant d'écrire (évite un rejet RLS silencieux)
+    var _up=await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()}).select();
+    if(_up&&_up.error){res.style.color='var(--rouge)';res.textContent='Enregistrement refusé : '+(_up.error.message||_up.error.hint||'reconnecte-toi et réessaie');return;}
+    if(!_up||!_up.data||!_up.data.length){res.style.color='var(--rouge)';res.textContent='Enregistrement refusé (session expirée ?). Déconnecte-toi, reconnecte-toi, puis réessaie.';return;}
     if(_isBeauty()){
       for(var i=0;i<window.__resaStaff.length;i++){var t=window.__resaStaff[i];
         if(t._del){if(t.id)await sb.from('resa_staff').delete().eq('id',t.id);continue;}
