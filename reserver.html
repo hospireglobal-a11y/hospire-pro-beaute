@@ -266,13 +266,16 @@ function fillStaff(list){
 function showMsg(m){$('slotMsg').textContent=m;$('slotMsg').classList.remove('hide');$('slots').innerHTML='';}
 function hideMsg(){$('slotMsg').classList.add('hide');}
 
+var _slotReq=0;
 async function loadSlotsBeauty(){
+  var _rq=++_slotReq;
   sel.date=$('date').value;sel.time='';sel.staffId=($('staff')&&$('staff').value)||'';
   $('toStep2').disabled=true;$('slots').innerHTML='<div class="msg">Recherche…</div>';hideMsg();$('turnNote').textContent='';
   if(!BLOG||!sel.date||!sel.dur)return;
   try{
     var url='/api/book?blogId='+encodeURIComponent(BLOG)+'&date='+sel.date+'&dur='+sel.dur+(sel.staffId?('&staffId='+encodeURIComponent(sel.staffId)):'');
     var r=await fetch(url);var j=await r.json();
+    if(_rq!==_slotReq)return; // réponse périmée (date changée entre-temps) → ignorer
     if(j&&j.staff)fillStaff(j.staff);
     var slots=(j&&j.slots)||[];
     if(!slots.length){
@@ -280,19 +283,22 @@ async function loadSlotsBeauty(){
       var m=reason==='no_staff'?"Prise de rendez-vous bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='paused'?"Pas de rendez-vous en ligne ce jour — choisis une autre date 🌸":"Complet ce jour — essaie une autre date.";
       showMsg(m);return;
     }
+    hideMsg();
     $('slots').innerHTML='';
     slots.forEach(function(s){var el=document.createElement('div');el.className='slot';el.textContent=s;el.onclick=function(){pickSlot(s,el);};$('slots').appendChild(el);});
     $('turnNote').textContent='Durée : '+sel.dur+' min.';
-  }catch(e){showMsg("Erreur de chargement. Réessaie.");}
+  }catch(e){if(_rq===_slotReq)showMsg("Erreur de chargement. Réessaie.");}
 }
 async function loadSlots(){
   if(BEAUTY)return loadSlotsBeauty();
+  var _rq=++_slotReq;
   sel.party=parseInt($('party').value,10)||2;sel.date=$('date').value;sel.time='';
   $('toStep2').disabled=true;$('slots').innerHTML='<div class="msg">Recherche…</div>';hideMsg();$('turnNote').textContent='';
   if(!BLOG||!sel.date)return;
   try{
     var r=await fetch('/api/book?blogId='+encodeURIComponent(BLOG)+'&date='+sel.date+'&party='+sel.party);
     var j=await r.json();
+    if(_rq!==_slotReq)return; // réponse périmée → ignorer
     var slots=(j&&j.slots)||[];
     if(j&&j.turn)sel.turn=j.turn;
     if(!slots.length){
@@ -300,10 +306,11 @@ async function loadSlots(){
       var m=reason==='no_tables'?"Réservation en ligne bientôt disponible.":reason==='closed'?"Fermé ce jour — choisis une autre date.":reason==='paused'?"Pas de réservation en ligne ce jour — choisis une autre date.":reason==='party_too_big'?("Pour "+sel.party+" personnes, contacte-nous directement."):"Complet ce jour — essaie une autre date.";
       showMsg(m);return;
     }
+    hideMsg();
     $('slots').innerHTML='';
     slots.forEach(function(s){var el=document.createElement('div');el.className='slot';el.textContent=s;el.onclick=function(){pickSlot(s,el);};$('slots').appendChild(el);});
     $('turnNote').textContent='Durée estimée de la table : '+(sel.turn)+' min.';
-  }catch(e){showMsg("Erreur de chargement. Réessaie.");}
+  }catch(e){if(_rq===_slotReq)showMsg("Erreur de chargement. Réessaie.");}
 }
 function pickSlot(s,el){sel.time=s;document.querySelectorAll('.slot').forEach(function(x){x.classList.remove('on');});el.classList.add('on');$('toStep2').disabled=false;}
 
