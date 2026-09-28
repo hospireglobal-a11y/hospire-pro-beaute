@@ -3094,9 +3094,14 @@ window.saveResaConfig=async function(){
       }
       window.__resaTables=window.__resaTables.filter(function(t){return !t._del;});
     }
-    res.style.color='var(--vert)';res.textContent='✓ Configuration enregistrée.';
-    setTimeout(function(){document.getElementById('resaConfigModal').style.display='none';},800);
-  }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}
+    // Vérification réelle : relire la config depuis la base et confirmer que les horaires ont bien persisté
+    var _chk=await sb.from('resa_config').select('data').eq('blog_id',window.currentBlog).maybeSingle();
+    var _w=(_chk&&_chk.data&&_chk.data.data&&_chk.data.data.windows)||{};
+    var _nb=Object.keys(_w).filter(function(k){return (_w[k]||[]).length;}).length;
+    if(_nb>0){res.style.color='var(--vert)';res.textContent='✓ Enregistré [v3] · '+_nb+' jour(s) ouvert(s) · établissement '+window.currentBlog;
+      setTimeout(function(){document.getElementById('resaConfigModal').style.display='none';},1400);
+    }else{res.style.color='var(--rouge)';res.textContent='⚠ [v3] Écriture NON persistée pour l\'établissement '+window.currentBlog+' (sécurité/session). Envoie ce message à Anass.';}
+  }catch(e){res.style.color='var(--rouge)';res.textContent='Erreur [v3] : '+String(e);}
 };
 /* ---- Widget de réservation (lien + iframe à intégrer) ---- */
 window.fillWidget=function(){
