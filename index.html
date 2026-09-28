@@ -3052,8 +3052,10 @@ window.saveResaConfig=async function(){
   var res=document.getElementById('cf_res');
   if(typeof sb==='undefined'||!sb||!window.currentBlog){res.style.color='var(--rouge)';res.textContent='Connecte-toi pour enregistrer.';return;}
   var windows={},bad=false;
+  // Parser tolérant : accepte 10:00-19:00, 10h-19h, 10h30-19h, 10.00-19.00, tirets – — , espaces
+  function _normHM(s){s=String(s).trim().toLowerCase().replace(/\s+/g,'');var m=s.match(/^(\d{1,2})(?:[:h.](\d{1,2}))?h?$/);if(!m)return null;var hh=+m[1],mm=(m[2]!=null&&m[2]!=='')?+m[2]:0;if(hh>23||mm>59)return null;return('0'+hh).slice(-2)+':'+('0'+mm).slice(-2);}
   RES_DAYS.forEach(function(d){var raw=(document.getElementById('cfh_'+d[0]).value||'').trim();var arr=[];
-    if(raw){raw.split(',').forEach(function(part){part=part.trim();if(!part)return;var m=part.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/);if(m)arr.push({start:m[1],end:m[2]});else bad=true;});}
+    if(raw){raw.split(',').forEach(function(part){part=part.trim();if(!part)return;var pm=part.split(/\s*[-–—]\s*/);if(pm.length!==2){bad=true;return;}var a=_normHM(pm[0]),b=_normHM(pm[1]);if(a&&b)arr.push({start:a,end:b});else bad=true;});}
     windows[d[0]]=arr;});
   if(bad){res.style.color='var(--rouge)';res.textContent="Format d'horaire invalide. Utilise 12:00-14:00.";return;}
   var turn=parseInt(document.getElementById('cf_turn').value,10)||90;
