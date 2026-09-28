@@ -2521,7 +2521,7 @@ function _dtLocal(d){var p=function(n){return('0'+n).slice(-2);};return d.getFul
 function _pauseFmt(iso){try{return new Date(iso).toLocaleString((window.__loc||'fr-FR'),{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return iso;}}
 function _pauses(){return (window.__resaCfg&&Array.isArray(window.__resaCfg.pauses))?window.__resaCfg.pauses:[];}
 window.openPauseModal=async function(){
-  if((!window.__resaCfg||!Object.keys(window.__resaCfg).length)&&typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}}
+  if(typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}} // toujours recharger la vraie config (mode + horaires) avant d'ajouter une absence
   var now=new Date();var end=new Date();end.setHours(23,59,0,0);
   var f=document.getElementById('pz_from'),t=document.getElementById('pz_to');
   if(f)f.value=_dtLocal(now);if(t)t.value=_dtLocal(end);
@@ -2538,7 +2538,10 @@ window.pausePreset=function(kind){
   document.getElementById('pz_to').value=_dtLocal(to);
 };
 async function _persistCfg(res){
-  try{await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()});return true;}
+  try{
+    if(!window.__resaCfg)window.__resaCfg={};
+    if(_isBeauty())window.__resaCfg.mode='beauty'; // ne JAMAIS perdre le mode en sauvant une absence (sinon la résa beauté casse)
+    await sb.from('resa_config').upsert({blog_id:window.currentBlog,data:window.__resaCfg,updated_at:new Date().toISOString()});return true;}
   catch(e){if(res){res.style.color='var(--rouge)';res.textContent='Erreur : '+String(e);}return false;}
 }
 window.savePause=async function(){
