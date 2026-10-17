@@ -548,6 +548,10 @@
   .nr-ac-item:hover,.nr-ac-item.on{background:var(--gold-soft)}
   .nr-ac-n{font-size:14px;font-weight:600;color:var(--ink)}
   .nr-ac-s{font-size:12px;color:var(--muted);margin-top:1px}
+  .nr-ac-hab{font-size:10.5px;font-weight:700;color:var(--gold);vertical-align:middle}
+  .nr-tag{margin:-6px 0 10px;padding:9px 12px;border-radius:10px;font-size:12.5px;line-height:1.5;background:var(--gold-soft);color:var(--ink);border:1px solid var(--line)}
+  .nr-tag.hab{background:var(--gold-soft);border-color:var(--gold);color:var(--espresso)}
+  .nr-tag b{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -1034,6 +1038,7 @@
 <div id="newResaModal"><div class="m">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="disp" id="nr_title" style="font-size:22px;font-weight:600">Nouvelle réservation</div><span onclick="document.getElementById('newResaModal').style.display='none'" style="cursor:pointer;color:var(--muted);font-size:20px">✕</span></div>
   <div class="field" style="position:relative"><label>Nom du client</label><input id="nr_name" placeholder="Fam. Bernard" autocomplete="off" oninput="_nrAcFilter()" onkeydown="_nrAcKey(event)" onblur="setTimeout(function(){var b=document.getElementById('nr_ac');if(b)b.style.display='none';},150)"><div id="nr_ac" class="nr-ac" style="display:none"></div></div>
+  <div id="nr_clientTag" class="nr-tag" style="display:none"></div>
   <div class="field"><label>Date et heure</label><input type="datetime-local" id="nr_dt"></div>
   <div class="field" id="nrf_presta" style="display:none"><label>Prestation(s)</label><div id="nr_prestaList"></div><button type="button" id="nr_addPresta" class="btn ghost" style="width:100%;margin-top:2px;font-size:13px;padding:9px" onclick="_nrAddPrestaRow()">+ Ajouter une prestation</button><div id="nr_prestaTotal" style="margin-top:6px;font-size:12.5px;color:var(--gold);font-weight:600"></div></div>
   <div class="field" id="nrf_staff" style="display:none"><label>Avec qui ?</label><select id="nr_staff"></select></div>
@@ -2806,25 +2811,41 @@ window.loadNrClients=async function(force){
   if(typeof sb==='undefined'||!sb||!window.currentBlog)return;
   if(!force&&window.__nrClients&&(Date.now()-(window.__nrClientsAt||0)<300000))return; // cache 5 min
   try{
-    var r=await sb.from('reservations').select('name,phone,email,date_time').eq('blog_id',window.currentBlog).order('date_time',{ascending:false}).limit(3000);
+    var r=await sb.from('reservations').select('name,phone,email,date_time,notes,service').eq('blog_id',window.currentBlog).order('date_time',{ascending:false}).limit(3000);
     var rows=(r&&r.data)||[];var map={};
     rows.forEach(function(x){
       var nm=(x.name||'').trim();if(!nm)return;
       var phone=(x.phone||'').trim(),email=(x.email||'').trim();
       var key=_nrNorm(nm)+'|'+(phone||email||'').toLowerCase();
       var c=map[key];
-      if(!c){c={name:nm,phone:phone,email:email,count:0,last:x.date_time||''};map[key]=c;}
+      if(!c){c={name:nm,phone:phone,email:email,count:0,last:x.date_time||'',notes:'',service:''};map[key]=c;}
       c.count++;
       if(!c.phone&&phone)c.phone=phone;if(!c.email&&email)c.email=email;
       if((x.date_time||'')>c.last)c.last=x.date_time||'';
+      // rows triés du + récent au + ancien → le 1er non-vide rencontré = le + récent
+      if(!c.notes&&(x.notes||'').trim())c.notes=(x.notes||'').trim();
+      if(!c.service&&(x.service||'').trim())c.service=(x.service||'').trim();
     });
     var arr=[];for(var k in map)arr.push(map[k]);
     arr.sort(function(a,b){return (b.last||'').localeCompare(a.last||'')||(b.count-a.count);}); // plus récent, puis plus fréquent
     window.__nrClients=arr;window.__nrClientsAt=Date.now();
   }catch(e){}
 };
+function _nrHideTag(){var t=document.getElementById('nr_clientTag');if(t){t.style.display='none';t.innerHTML='';}}
+function _nrShowTag(c){
+  var t=document.getElementById('nr_clientTag');if(!t)return;
+  var habit=c.count>=3; // habituelle = au moins 3 passages
+  var bits=[];
+  bits.push((habit?'<b>✨ Cliente habituelle</b> · ':'')+c.count+' visite'+(c.count>1?'s':''));
+  if(c.last){try{bits.push('dernière : '+new Date(c.last).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}));}catch(e){}}
+  if(c.service)bits.push('souvent : '+_esc(c.service));
+  t.innerHTML=bits.join('<br>');
+  t.className='nr-tag'+(habit?' hab':'');
+  t.style.display='block';
+}
 window._nrAcFilter=function(){
   var inp=document.getElementById('nr_name'),box=document.getElementById('nr_ac');if(!inp||!box)return;
+  _nrHideTag(); // dès qu'elle retape, on enlève l'étiquette précédente
   var q=_nrNorm(inp.value.trim());
   if(q.length<1||!window.__nrClients||!window.__nrClients.length){box.style.display='none';box.innerHTML='';return;}
   var hits=window.__nrClients.filter(function(c){return _nrNorm(c.name).indexOf(q)>=0;}).slice(0,6);
@@ -2832,7 +2853,8 @@ window._nrAcFilter=function(){
   box.__hits=hits;box.__sel=-1;
   box.innerHTML=hits.map(function(c,i){
     var sub=[c.phone,c.email].filter(Boolean).join(' · ');
-    return '<div class="nr-ac-item" data-i="'+i+'" onmousedown="event.preventDefault();_nrAcPick('+i+')"><div class="nr-ac-n">'+_esc(c.name)+'</div>'+(sub?('<div class="nr-ac-s">'+_esc(sub)+'</div>'):'')+'</div>';
+    var hab=c.count>=3?' <span class="nr-ac-hab">✨ habituelle</span>':(c.count>1?' <span class="nr-ac-hab" style="color:var(--muted)">'+c.count+'×</span>':'');
+    return '<div class="nr-ac-item" data-i="'+i+'" onmousedown="event.preventDefault();_nrAcPick('+i+')"><div class="nr-ac-n">'+_esc(c.name)+hab+'</div>'+(sub?('<div class="nr-ac-s">'+_esc(sub)+'</div>'):'')+'</div>';
   }).join('');
   box.style.display='block';
 };
@@ -2840,6 +2862,9 @@ window._nrAcPick=function(i){
   var box=document.getElementById('nr_ac'),c=box&&box.__hits&&box.__hits[i];if(!c)return;
   var set=function(id,v){var e=document.getElementById(id);if(e)e.value=(v||'');};
   set('nr_name',c.name);if(c.phone)set('nr_phone',c.phone);if(c.email)set('nr_email',c.email);
+  // pré-remplit les notes/préférences habituelles, sans écraser ce qu'elle a déjà tapé
+  if(c.notes){var nt=document.getElementById('nr_notes');if(nt&&!nt.value.trim())nt.value=c.notes;}
+  _nrShowTag(c);
   box.style.display='none';box.innerHTML='';
 };
 window._nrAcKey=function(ev){
@@ -2861,6 +2886,7 @@ window.openNewResa=async function(){
   ['nr_name','nr_phone','nr_email','nr_allergens','nr_notes'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('nr_adults').value=2;document.getElementById('nr_children').value=0;document.getElementById('nr_res').textContent='';
   var _ac=document.getElementById('nr_ac');if(_ac){_ac.style.display='none';_ac.innerHTML='';}
+  if(typeof _nrHideTag==='function')_nrHideTag();
   if(window.loadNrClients)window.loadNrClients(); // précharge la base clientes pour l'autocomplétion
   if((_isBeauty()||!window.__resaTables||!window.__resaTables.length)&&typeof loadResaCfg==='function'){try{await loadResaCfg();}catch(e){}}
   if(_isBeauty()){
